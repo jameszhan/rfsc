@@ -6,5 +6,5 @@
 ##Related codes
 [Maven Startup](https://github.com/jameszhan/rfsc/tree/master/plexus)
 
-[Create Your First Plugin]https://github.com/jameszhan/rfsc/tree/master/hello-maven-plugin
+[Create Your First Plugin](https://github.com/jameszhan/rfsc/tree/master/hello-maven-plugin)
 
