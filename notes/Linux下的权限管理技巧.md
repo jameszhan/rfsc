@@ -38,7 +38,7 @@ deploy ALL=(ALL) NOPASSWD: ALL
 
 用户，组及权限控制的信息主要和/etc/sudoers，/etc/passwd，/etc/shadow，/etc/group几个文件相关，可以使用id，finger查看用户信息。
 
-/etc/sudoers
+####/etc/sudoers
 ~~~sh
 
 #常见格式规范
@@ -57,7 +57,7 @@ root ALL=(ALL)      ALL
 ~~~
 
 
-/etc/passwd
+####/etc/passwd
 ~~~sh
 
 ubuntu:x:1001:27:Ubuntu,,,:/home/ubuntu:/bin/bash
@@ -71,7 +71,7 @@ ubuntu:x:1001:27:Ubuntu,,,:/home/ubuntu:/bin/bash
 # /bin/bash => 该用户使用bash shell的路径.如果是 /sbin/nologin,表示无法登陆系统,只能以FTP形式登录; 如果是 /bin/false,则表示只能发邮件.
 ~~~
 
-/etc/shadow
+####/etc/shadow
 ~~~sh
 
 ubuntu:$6$9M43z06q$w/Q8D7pD7a/JNJKaI2jmcrNmumMHBu8poxU6VYzWFDac7FhtDspeaOLlKmEkgOGRRDW.Sxcow8kwzp7hGtUGf.:15758:0:99999:7:6:5:
@@ -87,7 +87,8 @@ ubuntu:$6$9M43z06q$w/Q8D7pD7a/JNJKaI2jmcrNmumMHBu8poxU6VYzWFDac7FhtDspeaOLlKmEkg
 #最后一个(:后) => 是为了以后的新开发项做准备的
 ~~~
 
-/etc/group
+
+####/etc/group
 ~~~sh
 
 sudo:x:27:james
