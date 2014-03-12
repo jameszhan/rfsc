@@ -10,13 +10,13 @@
 
 ~~~js
 
-	var values = {name: 'misko', gender: 'male'};
-	var log = [];
-	forEach(values, function(value, key){
-		this.push(key + ': ' + value);
-	}, log);
+var values = {name: 'misko', gender: 'male'};
+var log = [];
+forEach(values, function(value, key){
+    this.push(key + ': ' + value);
+}, log);
 
-	expect(log).toEqual(['name: misko', 'gender: male']);
+expect(log).toEqual(['name: misko', 'gender: male']);
 ~~~
 
 
@@ -38,7 +38,6 @@ annotate用于解析函数定义，并剥离出其依赖的参数列表。[annot
 
 expect(annotate(function(a, b, c){})).toEqual(['a', 'b', 'c']);
 expect(annotate(['a', 'b', 'c', function(a, b, c){}])).toEqual(['a', 'b', 'c']);
-
 ~~~
 
 ##invoke函数
@@ -46,38 +45,38 @@ invoke函数用于动态执行函数，并自动注入参数，如果locals定�
 
 ~~~js
 
-    var getService = function mockedService(serviceName) {
-        return "Mocked Value";
-    }
+var getService = function mockedService(serviceName) {
+    return "Mocked Value";
+}
 
-    var func = function(a, b, c){
-            console.log("arguments: [", [].join.call(arguments, ", "), "]");
-            console.log("this: ", this);
-            console.log(); },
-        target = {name: 'james'},
-        locals = {a: 1, b: 2, c: 3};
+var func = function(a, b, c){
+        console.log("arguments: [", [].join.call(arguments, ", "), "]");
+        console.log("this: ", this);
+        console.log(); },
+    target = {name: 'james'},
+    locals = {a: 1, b: 2, c: 3};
 
-    invoke(func);
-    //Outputs:
-    //arguments: [ Mocked Value, Mocked Value, Mocked Value ]
-	//this:  undefined
+invoke(func);
+//Outputs:
+//arguments: [ Mocked Value, Mocked Value, Mocked Value ]
+//this:  undefined
 
-    invoke(func, target);
-    //Outputs:
-    //arguments: [ Mocked Value, Mocked Value, Mocked Value ]
-	//this:  { name: 'james' }
+invoke(func, target);
+//Outputs:
+//arguments: [ Mocked Value, Mocked Value, Mocked Value ]
+//this:  { name: 'james' }
 
-    invoke(func, target, locals);
-    //Outputs:
-    //arguments: [ 1, 2, 3 ]
-	//this:  { name: 'james' }
+invoke(func, target, locals);
+//Outputs:
+//arguments: [ 1, 2, 3 ]
+//this:  { name: 'james' }
 
-    invoke(function(){
-        func.apply(this, arguments);
-    }, target, locals);
-    //Outputs:
-    //arguments: [  ]
-	//this:  { name: 'james' }
+invoke(function(){
+    func.apply(this, arguments);
+}, target, locals);
+//Outputs:
+//arguments: [  ]
+//this:  { name: 'james' }
 ~~~
 
 
@@ -89,57 +88,57 @@ createInternalInjector是invoke的增强版，实现了getService方法，加入
 
 ~~~js
 
-	var injector = createInternalInjector({}, function(serviceName){
-        return "Found: " + serviceName;
-    });
+var injector = createInternalInjector({}, function(serviceName){
+    return "Found: " + serviceName;
+});
 
-    var func = function(a, b, c){
-            console.log("arguments: [", [].join.call(arguments, ", "), "]");
-            console.log("this: ", this);
-            console.log(); },
-        target = {name: 'james'},
-        locals = {a: 1, b: 2, c: 3};
-
-    injector.invoke(func);
-    //Outputs:
-    //arguments: [ Found: a, Found: b, Found: c ]
-	//this:  undefined
-
-    injector.invoke(func, target);
-    //Outputs:
-    //arguments: [ Found: a, Found: b, Found: c ]
-	//this:  { name: 'james' }
-
-    injector.invoke(func, target, locals);
-    //Outputs:
-    //arguments: [ 1, 2, 3 ]
-	//this:  { name: 'james' }
-
-    var Hello = function(a, b, c){
-        this.name = "Hello";
-        console.log("arguments: [", [].join.apply(arguments, [", "]), "]");
+var func = function(a, b, c){
+        console.log("arguments: [", [].join.call(arguments, ", "), "]");
         console.log("this: ", this);
-    }
+        console.log(); },
+    target = {name: 'james'},
+    locals = {a: 1, b: 2, c: 3};
 
-    var ret = injector.instantiate(Hello);
-    //Outputs:
-    //arguments: [ Found: a, Found: b, Found: c ]
-	//this:  { name: 'Hello' }
-    console.log("ret:", ret); //Output: "ret: { name: 'Hello' }"
+injector.invoke(func);
+//Outputs:
+//arguments: [ Found: a, Found: b, Found: c ]
+//this:  undefined
 
-    var ret = injector.instantiate(Hello, locals);
-	//Outputs:
-    //arguments: [ 1, 2, 3 ]
-	//this:  { name: 'Hello' }
-    console.log("ret:", ret); //Output: "ret: { name: 'Hello' }"
+injector.invoke(func, target);
+//Outputs:
+//arguments: [ Found: a, Found: b, Found: c ]
+//this:  { name: 'james' }
 
-    console.log(injector.get('a')); // Output: "Found: a"
+injector.invoke(func, target, locals);
+//Outputs:
+//arguments: [ 1, 2, 3 ]
+//this:  { name: 'james' }
 
-    console.log(injector.annotate(Hello)); //Output: "[ 'a', 'b', 'c' ]"
+var Hello = function(a, b, c){
+    this.name = "Hello";
+    console.log("arguments: [", [].join.apply(arguments, [", "]), "]");
+    console.log("this: ", this);
+}
 
-    console.log(injector.has("a")); //Output: true
-    console.log(injector.has("b")); //Output: true
-    console.log(injector.has("g")); //Output: false
+var ret = injector.instantiate(Hello);
+//Outputs:
+//arguments: [ Found: a, Found: b, Found: c ]
+//this:  { name: 'Hello' }
+console.log("ret:", ret); //Output: "ret: { name: 'Hello' }"
+
+var ret = injector.instantiate(Hello, locals);
+//Outputs:
+//arguments: [ 1, 2, 3 ]
+//this:  { name: 'Hello' }
+console.log("ret:", ret); //Output: "ret: { name: 'Hello' }"
+
+console.log(injector.get('a')); // Output: "Found: a"
+
+console.log(injector.annotate(Hello)); //Output: "[ 'a', 'b', 'c' ]"
+
+console.log(injector.has("a")); //Output: true
+console.log(injector.has("b")); //Output: true
+console.log(injector.has("g")); //Output: false
 
 ~~~
 
@@ -173,133 +172,133 @@ provider的默认实现，value，factory，service都依赖于它。它用于�
 
 ~~~js
 
-	var l = require("../loader.js");
+var l = require("../loader.js");
 
-    var angularModule = l.setupModuleLoader(GLOBAL);
+var angularModule = l.setupModuleLoader(GLOBAL);
 
-	//请注意看以下不同的provider注入方式
-    var modules = modules || [];
-    var ngModule = angularModule('ng', [], function(){
-        console.log("config ng");
-    }).factory('f', function(){
-        return 'F in ng';
-    }).run(function(){
-        console.log("Run ng");
+//请注意看以下不同的provider注入方式
+var modules = modules || [];
+var ngModule = angularModule('ng', [], function(){
+    console.log("config ng");
+}).factory('f', function(){
+    return 'F in ng';
+}).run(function(){
+    console.log("Run ng");
+});
+
+modules.push("ng");
+modules.unshift(['$provide', function($provide) {
+    $provide.constant('a', 'A');
+    $provide.value('b', 'B');
+    $provide.factory('c', function(b){
+        return 'C(' + b + ')';
     });
-
-    modules.push("ng");
-    modules.unshift(['$provide', function($provide) {
-        $provide.constant('a', 'A');
-        $provide.value('b', 'B');
-        $provide.factory('c', function(b){
-            return 'C(' + b + ')';
-        });
-        $provide.provider('d', function(){
-            return {
-                $get: function(c){
-                   return 'D(' + c + ')';
-                }
+    $provide.provider('d', function(){
+        return {
+            $get: function(c){
+               return 'D(' + c + ')';
             }
-        });
-        $provide.service('e', function(d){
-            this.value = "E(" + d + ")";
-        });
-    }]);
-
-    modules.push(function($provide) {
-        $provide.value({
-            g: 'G'
-        });
-        $provide.decorator('f', function($delegate){
-            return "Decorator[" + $delegate + "]";
-        });
-        $provide.provider({
-            h: function(){
-                this.$get = ['g', function(g){
-                    return "h(" + g +  ")";
-                }];
-            }, i: function(){
-                return {
-                    $get: ['d', 'h', function(d, h){
-                        return "h{" + d +  ", " + h +"}";
-                    }]
-                };
-            }});
+        }
     });
+    $provide.service('e', function(d){
+        this.value = "E(" + d + ")";
+    });
+}]);
 
-    var injector = createInjector(modules);
-    //Outputs:
-    //config ng
-	//Run ng
+modules.push(function($provide) {
+    $provide.value({
+        g: 'G'
+    });
+    $provide.decorator('f', function($delegate){
+        return "Decorator[" + $delegate + "]";
+    });
+    $provide.provider({
+        h: function(){
+            this.$get = ['g', function(g){
+                return "h(" + g +  ")";
+            }];
+        }, i: function(){
+            return {
+                $get: ['d', 'h', function(d, h){
+                    return "h{" + d +  ", " + h +"}";
+                }]
+            };
+        }});
+});
 
-    var func = function(a, b, c, d, e, f, g, h, i){
-            console.log("arguments: [", [].join.call(arguments, ", "), "]");
-            console.log("this: ", this);
-            console.log(); },
-        func2 = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', function(){
-            console.log("arguments: [", [].join.call(arguments, ", "), "]");
-            console.log("this: ", this);
-            console.log();}],
-        target = {name: 'james'},
-        locals = {a: 1, b: 2, c: 3, d: 4, e: 5, f: 6, g: 7, h: 8, i: 9};
+var injector = createInjector(modules);
+//Outputs:
+//config ng
+//Run ng
 
-	//E 是service注入的，是一个对象，故显示为[object Object]
-    injector.invoke(func);
-    //Outputs:
-    //arguments: [ A, B, C(B), D(C(B)), [object Object], Decorator[F in ng], G, h(G), h{D(C(B)), h(G)} ]
-	//this:  undefined
-
-    injector.invoke(func2);
-    //Outputs:
-    //arguments: [ A, B, C(B), D(C(B)), [object Object], Decorator[F in ng], G, h(G), h{D(C(B)), h(G)} ]
-	//this:  undefined
-
-    injector.invoke(func, target);
-    //Outputs:
-    //arguments: [ A, B, C(B), D(C(B)), [object Object], Decorator[F in ng], G, h(G), h{D(C(B)), h(G)} ]
-	//this:  { name: 'james' }
-
-    injector.invoke(func2, target);
-    //Outputs:
-    //arguments: [ A, B, C(B), D(C(B)), [object Object], Decorator[F in ng], G, h(G), h{D(C(B)), h(G)} ]
-	//this:  { name: 'james' }
-
-    injector.invoke(func, target, locals);
-    //Outputs:
-    //arguments: [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ]
-	//this:  { name: 'james' }
-
-    injector.invoke(func2, target, locals);
-	//Outputs:
-	//arguments: [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ]
-	//this:  { name: 'james' }
-
-    var Hello = function(a, b, c, d, e, f, g, h){
-        this.name = "Hello";
-        console.log("arguments: [", [].join.apply(arguments, [", "]), "]");
+var func = function(a, b, c, d, e, f, g, h, i){
+        console.log("arguments: [", [].join.call(arguments, ", "), "]");
         console.log("this: ", this);
-        console.log();
-    }
+        console.log(); },
+    func2 = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', function(){
+        console.log("arguments: [", [].join.call(arguments, ", "), "]");
+        console.log("this: ", this);
+        console.log();}],
+    target = {name: 'james'},
+    locals = {a: 1, b: 2, c: 3, d: 4, e: 5, f: 6, g: 7, h: 8, i: 9};
 
-    var ret = injector.instantiate(Hello);
-    //Outputs:
-    //arguments: [ A, B, C(B), D(C(B)), [object Object], Decorator[F in ng], G, h(G) ]
-	//this:  { name: 'Hello' }
-    console.log("ret: " + ret); //Output: "ret:  { name: 'Hello' }"
+//E 是service注入的，是一个对象，故显示为[object Object]
+injector.invoke(func);
+//Outputs:
+//arguments: [ A, B, C(B), D(C(B)), [object Object], Decorator[F in ng], G, h(G), h{D(C(B)), h(G)} ]
+//this:  undefined
 
-    var ret = injector.instantiate(Hello, locals);
-    //Outputs:
-    //arguments: [ 1, 2, 3, 4, 5, 6, 7, 8 ]
-	//this:  { name: 'Hello' }
-    console.log("ret: " + ret); //Output: "ret:  { name: 'Hello' }"
+injector.invoke(func2);
+//Outputs:
+//arguments: [ A, B, C(B), D(C(B)), [object Object], Decorator[F in ng], G, h(G), h{D(C(B)), h(G)} ]
+//this:  undefined
 
-    console.log(injector.get('a')); //Output: 'A'
+injector.invoke(func, target);
+//Outputs:
+//arguments: [ A, B, C(B), D(C(B)), [object Object], Decorator[F in ng], G, h(G), h{D(C(B)), h(G)} ]
+//this:  { name: 'james' }
 
-    console.log(injector.annotate(Hello)); //Output: "[ 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' ]"
+injector.invoke(func2, target);
+//Outputs:
+//arguments: [ A, B, C(B), D(C(B)), [object Object], Decorator[F in ng], G, h(G), h{D(C(B)), h(G)} ]
+//this:  { name: 'james' }
 
-    console.log(injector.has("a")); //Output: true
-    console.log(injector.has("b")); //Output: true
-    console.log(injector.has("z")); //Output: false
+injector.invoke(func, target, locals);
+//Outputs:
+//arguments: [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ]
+//this:  { name: 'james' }
+
+injector.invoke(func2, target, locals);
+//Outputs:
+//arguments: [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ]
+//this:  { name: 'james' }
+
+var Hello = function(a, b, c, d, e, f, g, h){
+    this.name = "Hello";
+    console.log("arguments: [", [].join.apply(arguments, [", "]), "]");
+    console.log("this: ", this);
+    console.log();
+}
+
+var ret = injector.instantiate(Hello);
+//Outputs:
+//arguments: [ A, B, C(B), D(C(B)), [object Object], Decorator[F in ng], G, h(G) ]
+//this:  { name: 'Hello' }
+console.log("ret: " + ret); //Output: "ret:  { name: 'Hello' }"
+
+var ret = injector.instantiate(Hello, locals);
+//Outputs:
+//arguments: [ 1, 2, 3, 4, 5, 6, 7, 8 ]
+//this:  { name: 'Hello' }
+console.log("ret: " + ret); //Output: "ret:  { name: 'Hello' }"
+
+console.log(injector.get('a')); //Output: 'A'
+
+console.log(injector.annotate(Hello)); //Output: "[ 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' ]"
+
+console.log(injector.has("a")); //Output: true
+console.log(injector.has("b")); //Output: true
+console.log(injector.has("z")); //Output: false
 
 ~~~
 
