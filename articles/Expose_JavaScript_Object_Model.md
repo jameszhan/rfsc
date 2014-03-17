@@ -48,12 +48,20 @@ function Hello(){}
 var hello = new Hello();
 ~~~
 
-![js_hello](./images/js_hello.png)
+当执行完以上这段代码，系统中会增加3个对象，一个是Hello函数对象，一个是附属于Hello的prototype对象，还一个是hello对象。它们有如下的依赖关系
+
+* Hello -> Function.prototype -> Object.prototype -> null
+* hello -> Hello.prototype -> Object.prototype -> null
+
+![js_hello1](./images/js_hello1.png)
 
 ~~~js
 Hello.prototype = {};
 var hello2 = new Hello();
 ~~~
+当改变constructor的prototype，对象的constructor也会相应地改变，并且对象的constructor一定等于其prototype的constructor。这里我们更新了Hello的prototype,然后派生出hello2。这个过程中，系统中增加了2个对象，{}和hello2，并且hello2的constructor就是{}的constructor，也即是Object.prototype.constructor。
+
+值得注意的是，之前的prototype将不再和Hello相关联，也即原来的hello对象和Hello函数没有任何关系，更新Hello.prototype将不会对hello产生任何影响（我们可以通过Object.getPrototypeOf(hello)得到其prototype）。
 
 ![js_hello2](./images/js_hello2.png)
 
@@ -62,5 +70,11 @@ function World(){}
 Hello.prototype = new World();
 var hello3 = new Hello();
 ~~~
+
+这里，我们引入了新的函数World，并更新了Hello.prototype到其派生对象，然后创建了一个新实例hello3，这个过程中，系统中共增加了4个对象，分别是World, World.prototype，new World()，以及hello3。同hello一样，hello2将不再于Hello产生任何关联，整个系统中的对象将有如下的依赖关系。
+
+* hello -> prototype(最初的Hello.prototype) -> Object.prototype -> null
+* hello2 -> {} -> Object.prototype -> null
+* hello3 -> new World() -> World.prototype -> Object.prototype -> null
 
 ![js_hello3](./images/js_hello3.png)
