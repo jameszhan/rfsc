@@ -35,13 +35,13 @@
 	* Date.prototype -> Object.prototype -> null
 	* RegExp.prototype -> Object.prototype -> null
 
-[system.js](https://github.com/jameszhan/simplifyjs/blob/master/kernel/system.js)	
+关联代码: [system.js](https://github.com/jameszhan/simplifyjs/blob/master/kernel/system.js)	
 	
 ###自定义对象原型的依赖关系
 ![js_prototypes](./images/js_prototypes_objects.png)
 
 
-##实例演示
+##内存模型
 ~~~js
 
 function Hello(){}
@@ -78,3 +78,66 @@ var hello3 = new Hello();
 * hello3 -> new World() -> World.prototype -> Object.prototype -> null
 
 ![js_hello3](./images/js_hello3.png)
+
+关联代码: [constructor.js](https://github.com/jameszhan/simplifyjs/blob/master/kernel/constructor.js)	
+
+
+
+##更好的JavaScript
+
+###忘掉丑陋的new关键字
+JavaScript的new关键字确实会使不少人感到困惑，当你熟悉原型编程以后，你会发现new这个关键字越来越蹩脚，但是由于历史原因，你又没有办法完全摆脱它，毕竟，普通对象上是没有prototype属性的，必须借助Function原型派生的对象作为其prototype宿主，而new恰恰充当了对象到其原型的桥梁作用。
+
+下面，我们将定义一个方法，把new给隐藏起来，允许从一个普通对象直接派生出其他对象。
+
+~~~js
+Object.beget = function(o){
+    var F = function(){};
+    F.prototype = o;
+    return new F();
+};
+~~~
+
+好的，我们下一步来看看如何使用它。
+
+~~~js
+var a = {};
+var b = Object.beget(a);
+var c = Object.beget(b);
+var d = Object.beget(c);
+var e = Object.beget(d);
+var f = Object.beget(c);
+~~~
+
+根据前面的知识，我们可以很容易地画出下面的内存模型图
+
+![js_abcdefg](./images/js_abcdefg.png)
+
+细心的同学可能会很好奇，F函数去哪儿了呢？其实我们完全没必要关心F的存在，就拿b来说，我们很容易地知道b的构造函数等于其原型的构造函数，即a的构造函数(Object)，事实上我们已经没有办法通过JavaScript的方法去得到F的信息了，从这个层面，其实F是可以被垃圾回收掉的。
+
+详细示例代码可以参考：[object_model.js](https://github.com/jameszhan/simplifyjs/blob/master/kernel/object_model.js)	
+
+###代码示例
+~~~
+var Vehicle = {
+    start: function(){
+        console.log("Start " + this);
+    },
+    stop: function(){
+        console.log("Stop " + this);
+    }
+}
+
+var Car = Object.beget(Vehicle);
+Car.tweet = function(){
+    console.log(this + " tweet");
+};
+
+var myCar = Object.beget(Car);
+Object.traceObj('myCar', myCar);
+myCar.start();
+myCar.tweet();
+myCar.stop();
+~~~
+
+详细示例代码可以参考：[examples.js](https://github.com/jameszhan/simplifyjs/blob/master/kernel/examples.js)	
