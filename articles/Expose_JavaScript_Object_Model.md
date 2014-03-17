@@ -61,7 +61,7 @@ var hello2 = new Hello();
 ~~~
 当改变constructor的prototype，对象的constructor也会相应地改变，并且对象的constructor一定等于其prototype的constructor。这里我们更新了Hello的prototype,然后派生出hello2。这个过程中，系统中增加了2个对象，{}和hello2，并且hello2的constructor就是{}的constructor，也即是Object.prototype.constructor。
 
-值得注意的是，之前的prototype将不再和Hello相关联，也即原来的hello对象和Hello函数没有任何关系，更新Hello.prototype将不会对hello产生任何影响（我们可以通过Object.getPrototypeOf(hello)得到其prototype）。
+值得注意的是，之前的prototype将不再和Hello相关联，也即原来的hello对象和Hello函数没有任何关系，更新Hello.prototype将不会对hello产生任何影响，我们可以通过Object.getPrototypeOf(hello)得到其prototype，值得注意的是，该prototype的constructor依然是Hello本身。
 
 ![js_hello2](./images/js_hello2.png)
 
