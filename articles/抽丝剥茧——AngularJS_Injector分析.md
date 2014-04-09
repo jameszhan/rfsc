@@ -1,4 +1,4 @@
-# 抽茧剥丝——AngularJS Injector 分析
+# 抽丝剥茧——AngularJS Injector 分析
 
 ##常用函数说明
 
