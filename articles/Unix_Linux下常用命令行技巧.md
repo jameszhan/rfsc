@@ -49,7 +49,7 @@ rename 's/^/0/'  [0-9][0-9].jpg   # 这一步把 10.jpg ..... 99.jpg 变幻为 0
 ~~~sh
 
 tail -f /var/log/messages #参数-f使tail不停地去读最新的内容，这样有实时监视的效果
-tail -f 500 /var/log/messages
+tail -fn 500 /var/log/messages
 ~~~
 
 ###使用ab进行压力测试
@@ -59,4 +59,15 @@ ab -c 100 -n 300 http://0.0.0.0:3000/
 ab -c 100 -n 300 -k -p user.json http://0.0.0.0:3000/users
 #-c 并发次数
 #-n 请求次数
+~~~
+
+###使用命令行快速分析日志
+假定日志格式为
+> 27.38.39.22 - - - [13/Apr/2014:23:52:59 +0800] "GET /sugou.1688.com/box/index.htm?trace_log=bzsg20131016_tbmjzxbz HTTP/1.1" 200 11129 43917 "http://tao.1688.com/greeting/hotsale_15.htm?sc=taobao&tracelog=hipage_fz_hotsale_tbc_toptab" "Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/21.0.1180.89 Safari/537.1" 27.38.39.96.1397041726487.734800.9 - "a=\"c_ms=1|c_mid=b2b-755419782|c_lid=%E6%88%91%E7%9A%84%E4%B8%AA%E6%80%A7%E6%88%91%E5%81%9A%E4%B8%BBwj\"; b=\"c_w_signed=Y\"; c=-" - 16016 sourcingmktweb-001.xyi
+
+~~~sh
+#取出所有访问的来源
+less apache.log | grep sugou.1688.com | awk '{print $13;}' | sort | uniq
+#多少个独立IP访问
+less apache.log | grep sugou.1688.com | awk '{print $1;}' | sort | uniq | wc -l
 ~~~
