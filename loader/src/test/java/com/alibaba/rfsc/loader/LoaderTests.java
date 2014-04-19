@@ -35,12 +35,19 @@ public class LoaderTests {
         loader.add("hadoop-tools", "tools/lib/*.jar", "hadoop-common");
 
         loader.add("hadoop-mapreduce", "mapreduce/*.jar", "hadoop-common");
-
         loader.add("hadoop-hdfs", "hdfs/*.jar", "hadoop-tools");
+        loader.add("hadoop-yarn", "yarn/*.jar", "hadoop-common");
         //ClassWorld classWorld =
         loader.load();
-        ClassRealm classRealm = loader.loadTarget("hadoop-mapreduce", System.getProperty("hadoop.example.jar"),
+        ClassRealm classRealm = loader.loadTarget("hadoop-example", System.getProperty("hadoop.example.jar"),
             System.getProperty("hadoop.example.path"));
+        classRealm.setParentRealm(loader.findClassRealm("hadoop-tools"));
+        classRealm.importFrom("hadoop-yarn", "org.apache.hadoop.yarn");
+        classRealm.importFrom("hadoop-mapreduce", "org.apache.hadoop.mapreduce");
+        classRealm.importFrom("hadoop-hdfs", "org.apache.hadoop.hdfs");
+
+        System.out.println();
+        System.out.println(loader.findClassRealm("hadoop-yarn").loadClass("org.apache.hadoop.yarn.util.Apps"));
 
         loader.launch(classRealm, "org.apache.hadoop.examples.WordCount", "/u/workdir/Codes/rfsc/LICENSE", "/tmp/out");
     }

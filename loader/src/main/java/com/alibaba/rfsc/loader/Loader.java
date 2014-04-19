@@ -66,14 +66,14 @@ public class Loader {
         return this;
     }
 
-    public ClassRealm loadTarget(final String parent, final String pattern, final String baseDir) throws IOException {
+    public ClassRealm loadTarget(final String relamId, final String pattern, final String baseDir) throws IOException {
         Path base = Paths.get(baseDir);
-        final ClassRealm classRealm = findClassRealm(parent);
+        final ClassRealm classRealm = findClassRealm(relamId);
         Files.walkFileTree(base, new SimpleFileVisitor<Path>(){
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                 PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:" + baseDir + "" + pattern);
                 if (matcher.matches(file)) {
-                    logger.debug("handle target {} to realm {}", file, parent);
+                    logger.debug("handle target {} to realm {}", file, relamId);
                     classRealm.addURL(file.toUri().toURL());
                 }
                 return FileVisitResult.CONTINUE;
