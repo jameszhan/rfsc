@@ -6,9 +6,13 @@
 package com.alibaba.rfsc.loader;
 
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
-import org.junit.Before;
+import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.io.IOException;
+import java.net.URL;
+import java.util.Enumeration;
 
 /**
  * Created with IntelliJ IDEA.
@@ -18,37 +22,58 @@ import org.junit.Test;
  *         Time: 1:36 AM
  */
 public class LoaderTests {
+    private static Loader loader;
 
-    @Before
-    public void prepareEnv(){
+    @BeforeClass
+    public static void setUpLoader() throws IOException {
         System.setProperty("hadoop.home.dir", "/usr/local/opt/hadoop");
         System.setProperty("hadoop.example.jar", "hadoop-mapreduce-examples-2.4.0.jar");
         System.setProperty("hadoop.example.path", "/opt/var/maven/org/apache/hadoop/hadoop-mapreduce-examples/2.4.0/");
-    }
-
-    @Test
-    public void loadHadoop() throws Exception {
         String hadoopDir = System.getProperty("hadoop.home.dir");
-        Loader loader = new Loader(hadoopDir + "/libexec/share/hadoop/");
+        loader = new Loader(hadoopDir + "/libexec/share/hadoop/");
         loader.add("hadoop-common-lib", "common/lib/*.jar");
         loader.add("hadoop-common", "common/*.jar", "hadoop-common-lib");
         loader.add("hadoop-tools", "tools/lib/*.jar", "hadoop-common");
 
-        loader.add("hadoop-mapreduce", "mapreduce/*.jar", "hadoop-common");
         loader.add("hadoop-hdfs", "hdfs/*.jar", "hadoop-tools");
         loader.add("hadoop-yarn", "yarn/*.jar", "hadoop-common");
+        loader.add("hadoop-mapreduce", "mapreduce/*.jar", "hadoop-yarn");
         //ClassWorld classWorld =
         loader.load();
+    }
+
+    @Test
+    public void loadResources() throws Exception {
+        ClassRealm classRealm = loadExample();
+        Enumeration<URL> resources = classRealm.getResources("META-INF/services/");
+        while (resources.hasMoreElements()) {
+            URL url =  resources.nextElement();
+            System.out.println(url);
+        }
+        System.out.println(classRealm.loadClass("org.apache.hadoop.log.metrics.EventCounter"));
+    }
+
+    /**
+     * hadoop jar /usr/local/Cellar/hadoop/2.3.0/libexec/share/hadoop/mapreduce/sources/hadoop-mapreduce-examples-2.3.0-sources.jar org.apache.hadoop.examples.WordCount /u/workdir/Codes/rfsc/LICENSE /tmp/out/wc
+     * hadoop jar /usr/local/Cellar/hadoop/2.3.0/libexec/share/hadoop/mapreduce/hadoop-mapreduce-examples-2.3.0.jar wordcount /u/workdir/Codes/rfsc/LICENSE /tmp/out/wc
+     * @throws Exception
+     */
+    @Test
+    public void wordCount() throws Exception {
+        ClassRealm classRealm = loadExample();
+        loader.launch(classRealm, "org.apache.hadoop.examples.WordCount", "/u/workdir/Codes/rfsc/LICENSE", "/tmp/out/wordCount");
+    }
+
+    @Test
+    public void grep() throws Exception {
+        ClassRealm classRealm = loadExample();
+        loader.launch(classRealm, "org.apache.hadoop.examples.Grep", "/u/workdir/Codes/rfsc/LICENSE", "/tmp/out/grep", "zhiqiangzhan");
+    }
+
+    private ClassRealm loadExample() throws IOException, NoSuchRealmException {
         ClassRealm classRealm = loader.loadTarget("hadoop-example", System.getProperty("hadoop.example.jar"),
-            System.getProperty("hadoop.example.path"));
-        classRealm.setParentRealm(loader.findClassRealm("hadoop-tools"));
-        classRealm.importFrom("hadoop-yarn", "org.apache.hadoop.yarn");
-        classRealm.importFrom("hadoop-mapreduce", "org.apache.hadoop.mapreduce");
-        classRealm.importFrom("hadoop-hdfs", "org.apache.hadoop.hdfs");
-
-        System.out.println();
-        System.out.println(loader.findClassRealm("hadoop-yarn").loadClass("org.apache.hadoop.yarn.util.Apps"));
-
-        loader.launch(classRealm, "org.apache.hadoop.examples.WordCount", "/u/workdir/Codes/rfsc/LICENSE", "/tmp/out");
+                System.getProperty("hadoop.example.path"));
+        classRealm.setParentRealm(loader.findClassRealm("hadoop-mapreduce"));
+        return classRealm;
     }
 }
