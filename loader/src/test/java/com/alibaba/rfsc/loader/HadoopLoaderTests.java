@@ -21,7 +21,7 @@ import java.util.Enumeration;
  *         Date: 4/13/14
  *         Time: 1:36 AM
  */
-public class LoaderTests {
+public class HadoopLoaderTests {
     private static Loader loader;
 
     @BeforeClass
