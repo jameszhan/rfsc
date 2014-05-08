@@ -1,0 +1,13 @@
+package com.alibaba.rfsc.proto.demo;
+
+message SearchRequest {
+    required string keyword = 1;
+}
+
+message SearchResponse {
+    required string result = 1;
+}
+
+service RpcService {
+    rpc Search (SearchRequest) returns (SearchResponse);
+}

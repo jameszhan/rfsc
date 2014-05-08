@@ -64,6 +64,22 @@
             </dependency>
 
             <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-yarn-server-resourcemanager</artifactId>
+                <version>${hadoop.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-yarn-server-nodemanager</artifactId>
+                <version>${hadoop.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-yarn-server-web-proxy</artifactId>
+                <version>${hadoop.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>org.apache.hive</groupId>
                 <artifactId>hive-common</artifactId>
                 <version>0.12.0</version>
@@ -161,6 +177,7 @@
         <module>plexus</module>
         <module>guice</module>
         <module>bigdata</module>
+        <module>clojure</module>
     </modules>
 
 </project>

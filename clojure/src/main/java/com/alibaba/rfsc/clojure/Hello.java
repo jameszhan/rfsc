@@ -5,6 +5,11 @@
  */
 package com.alibaba.rfsc.clojure;
 
+import clojure.java.api.Clojure;
+import clojure.lang.RT;
+import clojure.lang.Symbol;
+import clojure.lang.Var;
+
 /**
  * Created with IntelliJ IDEA.
  *
@@ -13,4 +18,14 @@ package com.alibaba.rfsc.clojure;
  *         Time: 8:34 PM
  */
 public class Hello {
+
+    public static void main(String[] args) {
+        //RT.var("clojure.core", "require").invoke(Symbol.intern("foo.ns"));
+        //RT.var("foo.ns", "bar-fn").invoke(1, 2, 3);
+        System.out.println(Clojure.var("clojure.core", "+").invoke(1, 2));
+
+        Var var = (Var)Clojure.var("clojure.core/fn*");
+        System.out.println(var);
+    }
+
 }
