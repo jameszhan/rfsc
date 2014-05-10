@@ -4423,6 +4423,8 @@
         (do (f) :ok)
         :no-test)))
 
+
+
 (defn re-pattern
   "Returns an instance of java.util.regex.Pattern, for use, e.g. in
   re-matcher."
@@ -4458,18 +4460,6 @@
             (recur (conj ret (. m (group c))) (inc c))
             ret)))))
 
-(defn re-seq
-  "Returns a lazy sequence of successive matches of pattern in string,
-  using java.util.regex.Matcher.find(), each such match processed with
-  re-groups."
-  {:added "1.0"
-   :static true}
-  [^java.util.regex.Pattern re s]
-  (let [m (re-matcher re s)]
-    ((fn step []
-       (when (. m (find))
-         (cons (re-groups m) (lazy-seq (step))))))))
-
 (defn re-matches
   "Returns the match, if any, of string to pattern, using
   java.util.regex.Matcher.matches().  Uses re-groups to return the
@@ -4481,7 +4471,6 @@
       (when (. m (matches))
         (re-groups m))))
 
-
 (defn re-find
   "Returns the next regex match, if any, of string to pattern, using
   java.util.regex.Matcher.find().  Uses re-groups to return the
@@ -4489,11 +4478,11 @@
   {:added "1.0"
    :static true}
   ([^java.util.regex.Matcher m]
-   (when (. m (find))
-     (re-groups m)))
+    (when (. m (find))
+      (re-groups m)))
   ([^java.util.regex.Pattern re s]
-   (let [m (re-matcher re s)]
-     (re-find m))))
+    (let [m (re-matcher re s)]
+      (re-find m))))
 
 (defmacro defn-
   "same as defn, yielding non-public def"
