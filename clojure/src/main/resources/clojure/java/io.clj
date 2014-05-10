@@ -21,27 +21,27 @@
                     CharArrayReader Closeable)
     (java.net URI URL MalformedURLException Socket URLDecoder URLEncoder)))
 
-(def
+#_(def
   ^{:doc "Type object for a Java primitive byte array."
     :private true
     }
   byte-array-type (class (make-array Byte/TYPE 0)))
 
-(def
+#_(def
   ^{:doc "Type object for a Java primitive char array."
     :private true}
   char-array-type (class (make-array Character/TYPE 0)))
 
-(defprotocol ^{:added "1.2"} Coercions
+#_(defprotocol ^{:added "1.2"} Coercions
   "Coerce between various 'resource-namish' things."
   (^{:tag java.io.File, :added "1.2"} as-file [x] "Coerce argument to a file.")
   (^{:tag java.net.URL, :added "1.2"} as-url [x] "Coerce argument to a URL."))
 
-(defn- escaped-utf8-urlstring->str [s]
+#_(defn- escaped-utf8-urlstring->str [s]
   (-> (clojure.string/replace s "+" (URLEncoder/encode "+" "UTF-8"))
     (URLDecoder/decode "UTF-8")))
 
-(extend-protocol Coercions
+#_(extend-protocol Coercions
   nil
   (as-file [_] nil)
   (as-url [_] nil)
@@ -66,7 +66,7 @@
   (as-url [u] (.toURL u))
   (as-file [u] (as-file (as-url u))))
 
-(defprotocol ^{:added "1.2"} IOFactory
+#_(defprotocol ^{:added "1.2"} IOFactory
   "Factory functions that create ready-to-use, buffered versions of
    the various Java I/O stream types, on top of anything that can
    be unequivocally converted to the requested kind of stream.
@@ -83,7 +83,7 @@
   (^{:added "1.2"} make-input-stream [x opts] "Creates a BufferedInputStream. See also IOFactory docs.")
   (^{:added "1.2"} make-output-stream [x opts] "Creates a BufferedOutputStream. See also IOFactory docs."))
 
-(defn ^Reader reader
+#_(defn ^Reader reader
   "Attempts to coerce its argument into an open java.io.Reader.
    Default implementations always return a java.io.BufferedReader.
 
@@ -101,7 +101,7 @@
   [x & opts]
   (make-reader x (when opts (apply hash-map opts))))
 
-(defn ^Writer writer
+#_(defn ^Writer writer
   "Attempts to coerce its argument into an open java.io.Writer.
    Default implementations always return a java.io.BufferedWriter.
 
@@ -118,7 +118,7 @@
   [x & opts]
   (make-writer x (when opts (apply hash-map opts))))
 
-(defn ^InputStream input-stream
+#_(defn ^InputStream input-stream
   "Attempts to coerce its argument into an open java.io.InputStream.
    Default implementations always return a java.io.BufferedInputStream.
 
@@ -135,7 +135,7 @@
   [x & opts]
   (make-input-stream x (when opts (apply hash-map opts))))
 
-(defn ^OutputStream output-stream
+#_(defn ^OutputStream output-stream
   "Attempts to coerce its argument into an open java.io.OutputStream.
    Default implementations always return a java.io.BufferedOutputStream.
 
@@ -152,16 +152,16 @@
   [x & opts]
   (make-output-stream x (when opts (apply hash-map opts))))
 
-(defn- ^Boolean append? [opts]
+#_(defn- ^Boolean append? [opts]
   (boolean (:append opts)))
 
-(defn- ^String encoding [opts]
+#_(defn- ^String encoding [opts]
   (or (:encoding opts) "UTF-8"))
 
-(defn- buffer-size [opts]
+#_(defn- buffer-size [opts]
   (or (:buffer-size opts) 1024))
 
-(def default-streams-impl
+#_(def default-streams-impl
   {:make-reader (fn [x opts] (make-reader (make-input-stream x opts) opts))
    :make-writer (fn [x opts] (make-writer (make-output-stream x opts) opts))
    :make-input-stream (fn [x opts]
@@ -171,65 +171,65 @@
                          (throw (IllegalArgumentException.
                                   (str "Cannot open <" (pr-str x) "> as an OutputStream."))))})
 
-(defn- inputstream->reader
+#_(defn- inputstream->reader
   [^InputStream is opts]
   (make-reader (InputStreamReader. is (encoding opts)) opts))
 
-(defn- outputstream->writer
+#_(defn- outputstream->writer
   [^OutputStream os opts]
   (make-writer (OutputStreamWriter. os (encoding opts)) opts))
 
-(extend BufferedInputStream
+#_(extend BufferedInputStream
   IOFactory
   (assoc default-streams-impl
     :make-input-stream (fn [x opts] x)
     :make-reader inputstream->reader))
 
-(extend InputStream
+#_(extend InputStream
   IOFactory
   (assoc default-streams-impl
     :make-input-stream (fn [x opts] (BufferedInputStream. x))
     :make-reader inputstream->reader))
 
-(extend Reader
+#_(extend Reader
   IOFactory
   (assoc default-streams-impl
     :make-reader (fn [x opts] (BufferedReader. x))))
 
-(extend BufferedReader
+#_(extend BufferedReader
   IOFactory
   (assoc default-streams-impl
     :make-reader (fn [x opts] x)))
 
-(extend Writer
+#_(extend Writer
   IOFactory
   (assoc default-streams-impl
     :make-writer (fn [x opts] (BufferedWriter. x))))
 
-(extend BufferedWriter
+#_(extend BufferedWriter
   IOFactory
   (assoc default-streams-impl
     :make-writer (fn [x opts] x)))
 
-(extend OutputStream
+#_(extend OutputStream
   IOFactory
   (assoc default-streams-impl
     :make-output-stream (fn [x opts] (BufferedOutputStream. x))
     :make-writer outputstream->writer))
 
-(extend BufferedOutputStream
+#_(extend BufferedOutputStream
   IOFactory
   (assoc default-streams-impl
     :make-output-stream (fn [x opts] x)
     :make-writer outputstream->writer))
 
-(extend File
+#_(extend File
   IOFactory
   (assoc default-streams-impl
     :make-input-stream (fn [^File x opts] (make-input-stream (FileInputStream. x) opts))
     :make-output-stream (fn [^File x opts] (make-output-stream (FileOutputStream. x (append? opts)) opts))))
 
-(extend URL
+#_(extend URL
   IOFactory
   (assoc default-streams-impl
     :make-input-stream (fn [^URL x opts]
@@ -242,13 +242,13 @@
                             (make-output-stream (as-file x) opts)
                             (throw (IllegalArgumentException. (str "Can not write to non-file URL <" x ">")))))))
 
-(extend URI
+#_(extend URI
   IOFactory
   (assoc default-streams-impl
     :make-input-stream (fn [^URI x opts] (make-input-stream (.toURL x) opts))
     :make-output-stream (fn [^URI x opts] (make-output-stream (.toURL x) opts))))
 
-(extend String
+#_(extend String
   IOFactory
   (assoc default-streams-impl
     :make-input-stream (fn [^String x opts]
@@ -262,34 +262,34 @@
                             (catch MalformedURLException err
                               (make-output-stream (File. x) opts))))))
 
-(extend Socket
+#_(extend Socket
   IOFactory
   (assoc default-streams-impl
     :make-input-stream (fn [^Socket x opts] (make-input-stream (.getInputStream x) opts))
     :make-output-stream (fn [^Socket x opts] (make-output-stream (.getOutputStream x) opts))))
 
-(extend byte-array-type
+#_(extend byte-array-type
   IOFactory
   (assoc default-streams-impl
     :make-input-stream (fn [x opts] (make-input-stream (ByteArrayInputStream. x) opts))))
 
-(extend char-array-type
+#_(extend char-array-type
   IOFactory
   (assoc default-streams-impl
     :make-reader (fn [x opts] (make-reader (CharArrayReader. x) opts))))
 
-(extend Object
+#_(extend Object
   IOFactory
   default-streams-impl)
 
-(defmulti
+#_(defmulti
   ^{:doc "Internal helper for copy"
     :private true
     :arglists '([input output opts])}
   do-copy
   (fn [input output opts] [(type input) (type output)]))
 
-(defmethod do-copy [InputStream OutputStream] [^InputStream input ^OutputStream output opts]
+#_(defmethod do-copy [InputStream OutputStream] [^InputStream input ^OutputStream output opts]
   (let [buffer (make-array Byte/TYPE (buffer-size opts))]
     (loop []
       (let [size (.read input buffer)]
@@ -297,7 +297,7 @@
           (do (.write output buffer 0 size)
             (recur)))))))
 
-(defmethod do-copy [InputStream Writer] [^InputStream input ^Writer output opts]
+#_(defmethod do-copy [InputStream Writer] [^InputStream input ^Writer output opts]
   (let [^"[C" buffer (make-array Character/TYPE (buffer-size opts))
         in (InputStreamReader. input (encoding opts))]
     (loop []
@@ -306,11 +306,11 @@
           (do (.write output buffer 0 size)
             (recur)))))))
 
-(defmethod do-copy [InputStream File] [^InputStream input ^File output opts]
+#_(defmethod do-copy [InputStream File] [^InputStream input ^File output opts]
   (with-open [out (FileOutputStream. output)]
     (do-copy input out opts)))
 
-(defmethod do-copy [Reader OutputStream] [^Reader input ^OutputStream output opts]
+#_(defmethod do-copy [Reader OutputStream] [^Reader input ^OutputStream output opts]
   (let [^"[C" buffer (make-array Character/TYPE (buffer-size opts))
         out (OutputStreamWriter. output (encoding opts))]
     (loop []
@@ -321,7 +321,7 @@
             (recur))
           (.flush out))))))
 
-(defmethod do-copy [Reader Writer] [^Reader input ^Writer output opts]
+#_(defmethod do-copy [Reader Writer] [^Reader input ^Writer output opts]
   (let [^"[C" buffer (make-array Character/TYPE (buffer-size opts))]
     (loop []
       (let [size (.read input buffer)]
@@ -329,19 +329,19 @@
           (do (.write output buffer 0 size)
             (recur)))))))
 
-(defmethod do-copy [Reader File] [^Reader input ^File output opts]
+#_(defmethod do-copy [Reader File] [^Reader input ^File output opts]
   (with-open [out (FileOutputStream. output)]
     (do-copy input out opts)))
 
-(defmethod do-copy [File OutputStream] [^File input ^OutputStream output opts]
+#_(defmethod do-copy [File OutputStream] [^File input ^OutputStream output opts]
   (with-open [in (FileInputStream. input)]
     (do-copy in output opts)))
 
-(defmethod do-copy [File Writer] [^File input ^Writer output opts]
+#_(defmethod do-copy [File Writer] [^File input ^Writer output opts]
   (with-open [in (FileInputStream. input)]
     (do-copy in output opts)))
 
-(defmethod do-copy [File File] [^File input ^File output opts]
+#_(defmethod do-copy [File File] [^File input ^File output opts]
   (with-open [in (-> input FileInputStream. .getChannel)
               out (-> output FileOutputStream. .getChannel)]
     (let [sz (.size in)]
@@ -351,34 +351,34 @@
           (when (< pos sz)
             (recur pos)))))))
 
-(defmethod do-copy [String OutputStream] [^String input ^OutputStream output opts]
+#_(defmethod do-copy [String OutputStream] [^String input ^OutputStream output opts]
   (do-copy (StringReader. input) output opts))
 
-(defmethod do-copy [String Writer] [^String input ^Writer output opts]
+#_(defmethod do-copy [String Writer] [^String input ^Writer output opts]
   (do-copy (StringReader. input) output opts))
 
-(defmethod do-copy [String File] [^String input ^File output opts]
+#_(defmethod do-copy [String File] [^String input ^File output opts]
   (do-copy (StringReader. input) output opts))
 
-(defmethod do-copy [char-array-type OutputStream] [input ^OutputStream output opts]
+#_(defmethod do-copy [char-array-type OutputStream] [input ^OutputStream output opts]
   (do-copy (CharArrayReader. input) output opts))
 
-(defmethod do-copy [char-array-type Writer] [input ^Writer output opts]
+#_(defmethod do-copy [char-array-type Writer] [input ^Writer output opts]
   (do-copy (CharArrayReader. input) output opts))
 
-(defmethod do-copy [char-array-type File] [input ^File output opts]
+#_(defmethod do-copy [char-array-type File] [input ^File output opts]
   (do-copy (CharArrayReader. input) output opts))
 
-(defmethod do-copy [byte-array-type OutputStream] [^"[B" input ^OutputStream output opts]
+#_(defmethod do-copy [byte-array-type OutputStream] [^"[B" input ^OutputStream output opts]
   (do-copy (ByteArrayInputStream. input) output opts))
 
-(defmethod do-copy [byte-array-type Writer] [^"[B" input ^Writer output opts]
+#_(defmethod do-copy [byte-array-type Writer] [^"[B" input ^Writer output opts]
   (do-copy (ByteArrayInputStream. input) output opts))
 
-(defmethod do-copy [byte-array-type File] [^"[B" input ^Writer output opts]
+#_(defmethod do-copy [byte-array-type File] [^"[B" input ^Writer output opts]
   (do-copy (ByteArrayInputStream. input) output opts))
 
-(defn copy
+#_(defn copy
   "Copies input to output.  Returns nil or throws IOException.
   Input may be an InputStream, Reader, File, byte[], or String.
   Output may be an OutputStream, Writer, or File.
@@ -395,7 +395,7 @@
   [input output & opts]
   (do-copy input output (when opts (apply hash-map opts))))
 
-(defn ^String as-relative-path
+#_(defn ^String as-relative-path
   "Take an as-file-able thing and return a string if it is
    a relative path, else IllegalArgumentException."
   {:added "1.2"}
@@ -405,7 +405,7 @@
       (throw (IllegalArgumentException. (str f " is not a relative path")))
       (.getPath f))))
 
-(defn ^File file
+#_(defn ^File file
   "Returns a java.io.File, passing each arg to as-file.  Multiple-arg
    versions treat the first argument as parent and subsequent args as
    children relative to the parent."
@@ -417,7 +417,7 @@
   ([parent child & more]
     (reduce file (file parent child) more)))
 
-(defn delete-file
+#_(defn delete-file
   "Delete file f. Raise an exception if it fails unless silently is true."
   {:added "1.2"}
   [f & [silently]]
@@ -425,7 +425,7 @@
     silently
     (throw (java.io.IOException. (str "Couldn't delete " f)))))
 
-(defn make-parents
+#_(defn make-parents
   "Given the same arg(s) as for file, creates all parent directories of
    the file they represent."
   {:added "1.2"}
@@ -433,7 +433,7 @@
   (when-let [parent (.getParentFile ^File (apply file f more))]
     (.mkdirs parent)))
 
-(defn ^URL resource
+#_(defn ^URL resource
   "Returns the URL for a named resource. Use the context class loader
    if no loader is specified."
   {:added "1.2"}
