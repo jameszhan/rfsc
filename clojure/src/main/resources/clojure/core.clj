@@ -702,7 +702,7 @@
        (cat (concat x y) zs))))
 
 ;;;;;;;;;;;;;;;;at this point all the support for syntax-quote exists;;;;;;;;;;;;;;;;;;;;;;
-(defmacro delay
+#_(defmacro delay
   "Takes a body of expressions and yields a Delay object that will
   invoke the body only the first time it is forced (with force or deref/@), and
   will cache the result and return it on all subsequent force
@@ -711,13 +711,13 @@
   [& body]
     (list 'new 'clojure.lang.Delay (list* `^{:once true} fn* [] body)))
 
-(defn delay?
+#_(defn delay?
   "returns true if x is a Delay created with delay"
   {:added "1.0"
    :static true}
   [x] (instance? clojure.lang.Delay x))
 
-(defn force
+#_(defn force
   "If x is a Delay, returns the (possibly cached) value of its expression, else returns x"
   {:added "1.0"
    :static true}
@@ -1088,7 +1088,7 @@
    :added "1.2"}
   [x] (. clojure.lang.Numbers (dec x)))
 
-(defn unchecked-inc-int
+#_(defn unchecked-inc-int
   "Returns a number one greater than x, an int.
   Note - uses a primitive operator subject to overflow."
   {:inline (fn [x] `(. clojure.lang.Numbers (unchecked_int_inc ~x)))
@@ -1102,84 +1102,84 @@
    :added "1.0"}
   [x] (. clojure.lang.Numbers (unchecked_inc x)))
 
-(defn unchecked-dec-int
+#_(defn unchecked-dec-int
   "Returns a number one less than x, an int.
   Note - uses a primitive operator subject to overflow."
   {:inline (fn [x] `(. clojure.lang.Numbers (unchecked_int_dec ~x)))
    :added "1.0"}
   [x] (. clojure.lang.Numbers (unchecked_int_dec x)))
 
-(defn unchecked-dec
+#_(defn unchecked-dec
   "Returns a number one less than x, a long.
   Note - uses a primitive operator subject to overflow."
   {:inline (fn [x] `(. clojure.lang.Numbers (unchecked_dec ~x)))
    :added "1.0"}
   [x] (. clojure.lang.Numbers (unchecked_dec x)))
 
-(defn unchecked-negate-int
+#_(defn unchecked-negate-int
   "Returns the negation of x, an int.
   Note - uses a primitive operator subject to overflow."
   {:inline (fn [x] `(. clojure.lang.Numbers (unchecked_int_negate ~x)))
    :added "1.0"}
   [x] (. clojure.lang.Numbers (unchecked_int_negate x)))
 
-(defn unchecked-negate
+#_(defn unchecked-negate
   "Returns the negation of x, a long.
   Note - uses a primitive operator subject to overflow."
   {:inline (fn [x] `(. clojure.lang.Numbers (unchecked_minus ~x)))
    :added "1.0"}
   [x] (. clojure.lang.Numbers (unchecked_minus x)))
 
-(defn unchecked-add-int
+#_(defn unchecked-add-int
   "Returns the sum of x and y, both int.
   Note - uses a primitive operator subject to overflow."
   {:inline (fn [x y] `(. clojure.lang.Numbers (unchecked_int_add ~x ~y)))
    :added "1.0"}
   [x y] (. clojure.lang.Numbers (unchecked_int_add x y)))
 
-(defn unchecked-add
+#_(defn unchecked-add
   "Returns the sum of x and y, both long.
   Note - uses a primitive operator subject to overflow."
   {:inline (fn [x y] `(. clojure.lang.Numbers (unchecked_add ~x ~y)))
    :added "1.0"}
   [x y] (. clojure.lang.Numbers (unchecked_add x y)))
 
-(defn unchecked-subtract-int
+#_(defn unchecked-subtract-int
   "Returns the difference of x and y, both int.
   Note - uses a primitive operator subject to overflow."
   {:inline (fn [x y] `(. clojure.lang.Numbers (unchecked_int_subtract ~x ~y)))
    :added "1.0"}
   [x y] (. clojure.lang.Numbers (unchecked_int_subtract x y)))
 
-(defn unchecked-subtract
+#_(defn unchecked-subtract
   "Returns the difference of x and y, both long.
   Note - uses a primitive operator subject to overflow."
   {:inline (fn [x y] `(. clojure.lang.Numbers (unchecked_minus ~x ~y)))
    :added "1.0"}
   [x y] (. clojure.lang.Numbers (unchecked_minus x y)))
 
-(defn unchecked-multiply-int
+#_(defn unchecked-multiply-int
   "Returns the product of x and y, both int.
   Note - uses a primitive operator subject to overflow."
   {:inline (fn [x y] `(. clojure.lang.Numbers (unchecked_int_multiply ~x ~y)))
    :added "1.0"}
   [x y] (. clojure.lang.Numbers (unchecked_int_multiply x y)))
 
-(defn unchecked-multiply
+#_(defn unchecked-multiply
   "Returns the product of x and y, both long.
   Note - uses a primitive operator subject to overflow."
   {:inline (fn [x y] `(. clojure.lang.Numbers (unchecked_multiply ~x ~y)))
    :added "1.0"}
   [x y] (. clojure.lang.Numbers (unchecked_multiply x y)))
 
-(defn unchecked-divide-int
+#_(defn unchecked-divide-int
   "Returns the division of x by y, both int.
   Note - uses a primitive operator subject to truncation."
   {:inline (fn [x y] `(. clojure.lang.Numbers (unchecked_int_divide ~x ~y)))
    :added "1.0"}
   [x y] (. clojure.lang.Numbers (unchecked_int_divide x y)))
 
-(defn unchecked-remainder-int
+#_(defn unchecked-remainder-int
   "Returns the remainder of division of x by y, both int.
   Note - uses a primitive operator subject to truncation."
   {:inline (fn [x y] `(. clojure.lang.Numbers (unchecked_int_remainder ~x ~y)))
@@ -1484,7 +1484,7 @@
   [^java.util.Map$Entry e]
     (. e (getValue)))
 
-(defn rseq
+#_(defn rseq
   "Returns, in constant time, a seq of the items in rev (which
   can be a vector or sorted-map), in reverse order. If rev is empty returns nil"
   {:added "1.0"
@@ -1508,7 +1508,7 @@
   [^clojure.lang.Named x]
     (. x (getNamespace)))
 
-(defmacro locking
+#_(defmacro locking
   "Executes exprs in an implicit do, while holding the monitor of x.
   Will release the monitor of x in all circumstances."
   {:added "1.0"}
@@ -1554,7 +1554,7 @@
         (recur threaded (next forms)))
       x)))
 
-(defmacro ->>
+#_(defmacro ->>
   "Threads the expr through the forms. Inserts x as the
   last item in the first form, making a list of it if it is not a
   list already. If there are more forms, inserts the first form as the
@@ -5459,7 +5459,7 @@
         (binding [*pending-paths* (conj *pending-paths* path)]
           (clojure.lang.RT/load (.substring path 1)))))))
 
-(defn compile
+#_(defn compile
   "Compiles the namespace named by the symbol lib into a set of
   classfiles. The source for the lib must be in a proper
   classpath-relative directory. The output files will go into the
@@ -5473,7 +5473,7 @@
 
 ;;;;;;;;;;;;; nested associative ops ;;;;;;;;;;;
 
-(defn get-in
+#_(defn get-in
   "Returns the value in a nested associative structure,
   where ks is a sequence of keys. Returns nil if the key
   is not present, or the not-found value if supplied."
@@ -5503,7 +5503,7 @@
     (assoc m k (assoc-in (get m k) ks v))
     (assoc m k v)))
 
-(defn update-in
+#_(defn update-in
   "'Updates' a value in a nested associative structure, where ks is a
   sequence of keys and f is a function that will take the old value
   and any supplied args and return the new value, and returns a new
@@ -5517,70 +5517,70 @@
      (assoc m k (apply f (get m k) args)))))
 
 
-(defn empty?
+#_(defn empty?
   "Returns true if coll has no items - same as (not (seq coll)).
   Please use the idiom (seq x) rather than (not (empty? x))"
   {:added "1.0"
    :static true}
   [coll] (not (seq coll)))
 
-(defn coll?
+#_(defn coll?
   "Returns true if x implements IPersistentCollection"
   {:added "1.0"
    :static true}
   [x] (instance? clojure.lang.IPersistentCollection x))
 
-(defn list?
+#_(defn list?
   "Returns true if x implements IPersistentList"
   {:added "1.0"
    :static true}
   [x] (instance? clojure.lang.IPersistentList x))
 
-(defn set?
+#_(defn set?
   "Returns true if x implements IPersistentSet"
   {:added "1.0"
    :static true}
   [x] (instance? clojure.lang.IPersistentSet x))
 
-(defn ifn?
+#_(defn ifn?
   "Returns true if x implements IFn. Note that many data structures
   (e.g. sets and maps) implement IFn"
   {:added "1.0"
    :static true}
   [x] (instance? clojure.lang.IFn x))
 
-(defn fn?
+#_(defn fn?
   "Returns true if x implements Fn, i.e. is an object created via fn."
   {:added "1.0"
    :static true}
   [x] (instance? clojure.lang.Fn x))
 
 
-(defn associative?
+#_(defn associative?
  "Returns true if coll implements Associative"
  {:added "1.0"
   :static true}
   [coll] (instance? clojure.lang.Associative coll))
 
-(defn sequential?
+#_(defn sequential?
  "Returns true if coll implements Sequential"
  {:added "1.0"
   :static true}
   [coll] (instance? clojure.lang.Sequential coll))
 
-(defn sorted?
+#_(defn sorted?
  "Returns true if coll implements Sorted"
  {:added "1.0"
    :static true}
   [coll] (instance? clojure.lang.Sorted coll))
 
-(defn counted?
+#_(defn counted?
  "Returns true if coll implements count in constant time"
  {:added "1.0"
    :static true}
   [coll] (instance? clojure.lang.Counted coll))
 
-(defn reversible?
+#_(defn reversible?
  "Returns true if coll implements Reversible"
  {:added "1.0"
    :static true}
@@ -5606,7 +5606,7 @@
    :added "1.0"}
  *e)
 
-(defn trampoline
+#_(defn trampoline
   "trampoline can be used to convert algorithms requiring mutual
   recursion without stack consumption. Calls f with supplied args, if
   any. If f returns a fn, calls that fn with no arguments, and
@@ -5640,7 +5640,7 @@
        (when (meta name) (.setMeta v (meta name)))
        v)))
 
-(defmacro while
+#_(defmacro while
   "Repeatedly executes body while test expression is true. Presumes
   some side-effect will cause test to become false/nil. Returns nil"
   {:added "1.0"}
@@ -5650,7 +5650,7 @@
        ~@body
        (recur))))
 
-(defn memoize
+#_(defn memoize
   "Returns a memoized version of a referentially transparent function. The
   memoized version of the function keeps a cache of the mapping from arguments
   to results and, when calls with the same arguments are repeated often, has
@@ -5836,20 +5836,20 @@
   "
   {:added "1.0"})
 
-(defn future?
+#_(defn future?
   "Returns true if x is a future"
   {:added "1.1"
    :static true}
   [x] (instance? java.util.concurrent.Future x))
 
-(defn future-done?
+#_(defn future-done?
   "Returns true if future f is done"
   {:added "1.1"
    :static true}
   [^java.util.concurrent.Future f] (.isDone f))
 
 
-(defmacro letfn 
+(defmacro letfn
   "fnspec ==> (fname [params*] exprs) or (fname ([params*] exprs)+)
 
   Takes a vector of function specs and a body, and generates a set of
@@ -5862,7 +5862,7 @@
                              (map #(cons `fn %) fnspecs)))
            ~@body))
 
-(defn fnil
+#_(defn fnil
   "Takes a function f, and returns a function that calls f, replacing
   a nil first argument to f with the supplied value x. Higher arity
   versions can replace arguments in the second and third
@@ -5904,167 +5904,6 @@
             (for [mask (map #(dec (bit-shift-left 1 %)) (range 1 (inc max-mask-bits)))
                   shift (range 0 31)]
               [shift mask]))))
-
-#_(defn- case-map
-  "Transforms a sequence of test constants and a corresponding sequence of then
-  expressions into a sorted map to be consumed by case*. The form of the map
-  entries are {(case-f test) [(test-f test) then]}."
-  [case-f test-f tests thens]
-  (into1 (sorted-map)
-    (zipmap (map case-f tests)
-            (map vector
-              (map test-f tests)
-              thens))))
-
-#_(defn- fits-table?
-  "Returns true if the collection of ints can fit within the
-  max-table-switch-size, false otherwise."
-  [ints]
-  (< (- (apply max (seq ints)) (apply min (seq ints))) max-switch-table-size))
-
-#_(defn- prep-ints
-  "Takes a sequence of int-sized test constants and a corresponding sequence of
-  then expressions. Returns a tuple of [shift mask case-map switch-type] where
-  case-map is a map of int case values to [test then] tuples, and switch-type
-  is either :sparse or :compact."
-  [tests thens]
-  (if (fits-table? tests)
-    ; compact case ints, no shift-mask
-    [0 0 (case-map int int tests thens) :compact]
-    (let [[shift mask] (or (maybe-min-hash (map int tests)) [0 0])]
-      (if (zero? mask)
-        ; sparse case ints, no shift-mask
-        [0 0 (case-map int int tests thens) :sparse]
-        ; compact case ints, with shift-mask
-        [shift mask (case-map #(shift-mask shift mask (int %)) int tests thens) :compact]))))
-
-#_(defn- merge-hash-collisions
-  "Takes a case expression, default expression, and a sequence of test constants
-  and a corresponding sequence of then expressions. Returns a tuple of
-  [tests thens skip-check-set] where no tests have the same hash. Each set of
-  input test constants with the same hash is replaced with a single test
-  constant (the case int), and their respective thens are combined into:
-  (condp = expr
-    test-1 then-1
-    ...
-    test-n then-n
-    default).
-  The skip-check is a set of case ints for which post-switch equivalence
-  checking must not be done (the cases holding the above condp thens)."
-  [expr-sym default tests thens]
-  (let [buckets (loop [m {} ks tests vs thens]
-                  (if (and ks vs)
-                    (recur
-                      (update-in m [(clojure.lang.Util/hash (first ks))] (fnil conj []) [(first ks) (first vs)])
-                      (next ks) (next vs))
-                    m))
-        assoc-multi (fn [m h bucket]
-                      (let [testexprs (apply concat bucket)
-                            expr `(condp = ~expr-sym ~@testexprs ~default)]
-                        (assoc m h expr)))
-        hmap (reduce1
-               (fn [m [h bucket]]
-                 (if (== 1 (count bucket))
-                   (assoc m (ffirst bucket) (second (first bucket)))
-                   (assoc-multi m h bucket)))
-               {} buckets)
-        skip-check (->> buckets
-                     (filter #(< 1 (count (second %))))
-                     (map first)
-                     (into1 #{}))]
-    [(keys hmap) (vals hmap) skip-check]))
-
-#_(defn- prep-hashes
-  "Takes a sequence of test constants and a corresponding sequence of then
-  expressions. Returns a tuple of [shift mask case-map switch-type skip-check]
-  where case-map is a map of int case values to [test then] tuples, switch-type
-  is either :sparse or :compact, and skip-check is a set of case ints for which
-  post-switch equivalence checking must not be done (occurs with hash
-  collisions)."
-  [expr-sym default tests thens]
-  (let [hashcode #(clojure.lang.Util/hash %)
-        hashes (into1 #{} (map hashcode tests))]
-    (if (== (count tests) (count hashes))
-      (if (fits-table? hashes)
-        ; compact case ints, no shift-mask
-        [0 0 (case-map hashcode identity tests thens) :compact]
-        (let [[shift mask] (or (maybe-min-hash hashes) [0 0])]
-          (if (zero? mask)
-            ; sparse case ints, no shift-mask
-            [0 0 (case-map hashcode identity tests thens) :sparse]
-            ; compact case ints, with shift-mask
-            [shift mask (case-map #(shift-mask shift mask (hashcode %)) identity tests thens) :compact])))
-      ; resolve hash collisions and try again
-      (let [[tests thens skip-check] (merge-hash-collisions expr-sym default tests thens)
-            [shift mask case-map switch-type] (prep-hashes expr-sym default tests thens)
-            skip-check (if (zero? mask)
-                         skip-check
-                         (into1 #{} (map #(shift-mask shift mask %) skip-check)))]
-        [shift mask case-map switch-type skip-check]))))
-
-
-#_(defmacro case
-  "Takes an expression, and a set of clauses.
-
-  Each clause can take the form of either:
-
-  test-constant result-expr
-
-  (test-constant1 ... test-constantN)  result-expr
-
-  The test-constants are not evaluated. They must be compile-time
-  literals, and need not be quoted.  If the expression is equal to a
-  test-constant, the corresponding result-expr is returned. A single
-  default expression can follow the clauses, and its value will be
-  returned if no clause matches. If no default expression is provided
-  and no clause matches, an IllegalArgumentException is thrown.
-
-  Unlike cond and condp, case does a constant-time dispatch, the
-  clauses are not considered sequentially.  All manner of constant
-  expressions are acceptable in case, including numbers, strings,
-  symbols, keywords, and (Clojure) composites thereof. Note that since
-  lists are used to group multiple constants that map to the same
-  expression, a vector can be used to match a list if needed. The
-  test-constants need not be all of the same type."
-  {:added "1.2"}
-
-  [e & clauses]
-  (let [ge (with-meta (gensym) {:tag Object})
-        default (if (odd? (count clauses)) 
-                  (last clauses)
-                  `(throw (IllegalArgumentException. (str "No matching clause: " ~ge))))]
-    (if (> 2 (count clauses))
-      `(let [~ge ~e] ~default)
-      (let [pairs (partition 2 clauses)
-            assoc-test (fn assoc-test [m test expr]
-                         (if (contains? m test)
-                           (throw (IllegalArgumentException. (str "Duplicate case test constant: " test)))
-                           (assoc m test expr)))
-            pairs (reduce1
-                       (fn [m [test expr]]
-                         (if (seq? test)
-                           (reduce1 #(assoc-test %1 %2 expr) m test)
-                           (assoc-test m test expr)))
-                       {} pairs)
-            tests (keys pairs)
-            thens (vals pairs)
-            mode (cond
-                   (every? #(and (integer? %) (<= Integer/MIN_VALUE % Integer/MAX_VALUE)) tests)
-                   :ints
-                   (every? keyword? tests)
-                   :identity
-                   :else :hashes)]
-        (condp = mode
-          :ints
-          (let [[shift mask imap switch-type] (prep-ints tests thens)]
-            `(let [~ge ~e] (case* ~ge ~shift ~mask ~default ~imap ~switch-type :int)))
-          :hashes
-          (let [[shift mask imap switch-type skip-check] (prep-hashes ge default tests thens)]
-            `(let [~ge ~e] (case* ~ge ~shift ~mask ~default ~imap ~switch-type :hash-equiv ~skip-check)))
-          :identity
-          (let [[shift mask imap switch-type skip-check] (prep-hashes ge default tests thens)]
-            `(let [~ge ~e] (case* ~ge ~shift ~mask ~default ~imap ~switch-type :hash-identity ~skip-check))))))))
-
 
 ;; redefine reduce with internal-reduce
 (defn reduced
