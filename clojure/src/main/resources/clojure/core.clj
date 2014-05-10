@@ -1484,7 +1484,7 @@
   [^java.util.Map$Entry e]
     (. e (getValue)))
 
-#_(defn rseq
+(defn rseq
   "Returns, in constant time, a seq of the items in rev (which
   can be a vector or sorted-map), in reverse order. If rev is empty returns nil"
   {:added "1.0"
@@ -1508,7 +1508,7 @@
   [^clojure.lang.Named x]
     (. x (getNamespace)))
 
-#_(defmacro locking
+(defmacro locking
   "Executes exprs in an implicit do, while holding the monitor of x.
   Will release the monitor of x in all circumstances."
   {:added "1.0"}
@@ -1551,22 +1551,6 @@
             threaded (if (seq? form)
                        (with-meta `(~(first form) ~x ~@(next form)) (meta form))
                        (list form x))]
-        (recur threaded (next forms)))
-      x)))
-
-#_(defmacro ->>
-  "Threads the expr through the forms. Inserts x as the
-  last item in the first form, making a list of it if it is not a
-  list already. If there are more forms, inserts the first form as the
-  last item in second form, etc."
-  {:added "1.1"}
-  [x & forms]
-  (loop [x x, forms forms]
-    (if forms
-      (let [form (first forms)
-            threaded (if (seq? form)
-              (with-meta `(~(first form) ~@(next form)  ~x) (meta form))
-              (list form x))]
         (recur threaded (next forms)))
       x)))
 
@@ -1649,46 +1633,13 @@
   [multifn dispatch-val & fn-tail]
   `(. ~(with-meta multifn {:tag 'clojure.lang.MultiFn}) addMethod ~dispatch-val (fn ~@fn-tail)))
 
-(defn remove-all-methods
-  "Removes all of the methods of multimethod."
-  {:added "1.2"
-   :static true} 
- [^clojure.lang.MultiFn multifn]
- (.reset multifn))
-
-(defn remove-method
-  "Removes the method of multimethod associated with dispatch-value."
-  {:added "1.0"
-   :static true}
- [^clojure.lang.MultiFn multifn dispatch-val]
- (. multifn removeMethod dispatch-val))
-
 (defn prefer-method
-  "Causes the multimethod to prefer matches of dispatch-val-x over dispatch-val-y 
+  "Causes the multimethod to prefer matches of dispatch-val-x over dispatch-val-y
    when there is a conflict"
   {:added "1.0"
    :static true}
   [^clojure.lang.MultiFn multifn dispatch-val-x dispatch-val-y]
   (. multifn preferMethod dispatch-val-x dispatch-val-y))
-
-(defn methods
-  "Given a multimethod, returns a map of dispatch values -> dispatch fns"
-  {:added "1.0"
-   :static true}
-  [^clojure.lang.MultiFn multifn] (.getMethodTable multifn))
-
-(defn get-method
-  "Given a multimethod and a dispatch value, returns the dispatch fn
-  that would apply to that value, or nil if none apply and no default"
-  {:added "1.0"
-   :static true}
-  [^clojure.lang.MultiFn multifn dispatch-val] (.getMethod multifn dispatch-val))
-
-(defn prefers
-  "Given a multimethod, returns a map of preferred value -> set of other values"
-  {:added "1.0"
-   :static true}
-  [^clojure.lang.MultiFn multifn] (.getPreferTable multifn))
 
 ;;;;;;;;; var stuff
 
@@ -1704,7 +1655,7 @@
 (defmacro if-let
   "bindings => binding-form test
 
-  If test is true, evaluates then with binding-form bound to the value of 
+  If test is true, evaluates then with binding-form bound to the value of
   test, if not, yields else"
   {:added "1.0"}
   ([bindings then]
@@ -1736,26 +1687,6 @@
          (let [~form temp#]
            ~@body)))))
 
-(defmacro if-some
-  "bindings => binding-form test
-
-   If test is not nil, evaluates then with binding-form bound to the
-   value of test, if not, yields else"
-  {:added "1.6"}
-  ([bindings then]
-   `(if-some ~bindings ~then nil))
-  ([bindings then else & oldform]
-   (assert-args
-     (vector? bindings) "a vector for its binding"
-     (nil? oldform) "1 or 2 forms after binding vector"
-     (= 2 (count bindings)) "exactly 2 forms in binding vector")
-   (let [form (bindings 0) tst (bindings 1)]
-     `(let [temp# ~tst]
-        (if (nil? temp#)
-          ~else
-          (let [~form temp#]
-            ~then))))))
-
 (defmacro when-some
   "bindings => binding-form test
 
@@ -1780,14 +1711,14 @@
   Takes a map of Var/value pairs. Binds each Var to the associated value for
   the current thread. Each call *MUST* be accompanied by a matching call to
   pop-thread-bindings wrapped in a try-finally!
-  
+
       (push-thread-bindings bindings)
       (try
         ...
         (finally
           (pop-thread-bindings)))"
   {:added "1.1"
-   :static true} 
+   :static true}
   [bindings]
   (clojure.lang.Var/pushThreadBindings bindings))
 
@@ -1854,55 +1785,13 @@
   [binding-map & body]
   `(with-bindings* ~binding-map (fn [] ~@body)))
 
-(defn bound-fn*
-  "Returns a function, which will install the same bindings in effect as in
-  the thread at the time bound-fn* was called and then call f with any given
-  arguments. This may be used to define a helper function which runs on a
-  different thread, but needs the same bindings in place."
-  {:added "1.1"
-   :static true}
-  [f]
-  (let [bindings (get-thread-bindings)]
-    (fn [& args]
-      (apply with-bindings* bindings f args))))
-
-(defmacro bound-fn
-  "Returns a function defined by the given fntail, which will install the
-  same bindings in effect as in the thread at the time bound-fn was called.
-  This may be used to define a helper function which runs on a different
-  thread, but needs the same bindings in place."
-  {:added "1.1"}
-  [& fntail]
-  `(bound-fn* (fn ~@fntail)))
-
-(defn find-var
-  "Returns the global var named by the namespace-qualified symbol, or
-  nil if no var with that name."
-  {:added "1.0"
-   :static true}
-  [sym] (. clojure.lang.Var (find sym)))
-
-#_(defn binding-conveyor-fn
-  {:private true
-   :added "1.3"}
-  [f]
-  (let [frame (clojure.lang.Var/cloneThreadBindingFrame)]
-    (fn 
-      ([]
-         (clojure.lang.Var/resetThreadBindingFrame frame)
-         (f))
-      ([x]
-         (clojure.lang.Var/resetThreadBindingFrame frame)
-         (f x))
-      ([x y]
-         (clojure.lang.Var/resetThreadBindingFrame frame)
-         (f x y))
-      ([x y z]
-         (clojure.lang.Var/resetThreadBindingFrame frame)
-         (f x y z))
-      ([x y z & args] 
-         (clojure.lang.Var/resetThreadBindingFrame frame)
-         (apply f x y z args)))))
+(defn agent-error
+   "Returns the exception thrown during an asynchronous action of the
+   agent if the agent is failed.  Returns nil if the agent is not
+   failed."
+   {:added "1.2"
+    :static true}
+   [^clojure.lang.Agent a] (.getError a))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Refs ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn ^{:private true}
@@ -1913,214 +1802,6 @@
     (when (:validator opts)
       (.setValidator r (:validator opts)))
     r))
-
-#_(defn agent
-  "Creates and returns an agent with an initial value of state and
-  zero or more options (in any order):
-
-  :meta metadata-map
-
-  :validator validate-fn
-
-  :error-handler handler-fn
-
-  :error-mode mode-keyword
-
-  If metadata-map is supplied, it will become the metadata on the
-  agent. validate-fn must be nil or a side-effect-free fn of one
-  argument, which will be passed the intended new state on any state
-  change. If the new state is unacceptable, the validate-fn should
-  return false or throw an exception.  handler-fn is called if an
-  action throws an exception or if validate-fn rejects a new state --
-  see set-error-handler! for details.  The mode-keyword may be either
-  :continue (the default if an error-handler is given) or :fail (the
-  default if no error-handler is given) -- see set-error-mode! for
-  details."
-  {:added "1.0"
-   :static true
-   }
-  ([state & options]
-     (let [a (new clojure.lang.Agent state)
-           opts (apply hash-map options)]
-       (setup-reference a options)
-       (when (:error-handler opts)
-         (.setErrorHandler a (:error-handler opts)))
-       (.setErrorMode a (or (:error-mode opts)
-                            (if (:error-handler opts) :continue :fail)))
-       a)))
-
-#_(defn set-agent-send-executor!
-  "Sets the ExecutorService to be used by send"
-  {:added "1.5"}
-  [executor]
-  (set! clojure.lang.Agent/pooledExecutor executor))
-
-#_(defn set-agent-send-off-executor!
-  "Sets the ExecutorService to be used by send-off"
-  {:added "1.5"}
-  [executor]
-  (set! clojure.lang.Agent/soloExecutor executor))
-
-#_(defn send-via
-  "Dispatch an action to an agent. Returns the agent immediately.
-  Subsequently, in a thread supplied by executor, the state of the agent
-  will be set to the value of:
-
-  (apply action-fn state-of-agent args)"
-  {:added "1.5"}
-  [executor ^clojure.lang.Agent a f & args]
-  (.dispatch a (binding [*agent* a] (binding-conveyor-fn f)) args executor))
-
-#_(defn send
-  "Dispatch an action to an agent. Returns the agent immediately.
-  Subsequently, in a thread from a thread pool, the state of the agent
-  will be set to the value of:
-
-  (apply action-fn state-of-agent args)"
-  {:added "1.0"
-   :static true}
-  [^clojure.lang.Agent a f & args]
-  (apply send-via clojure.lang.Agent/pooledExecutor a f args))
-
-#_(defn send-off
-  "Dispatch a potentially blocking action to an agent. Returns the
-  agent immediately. Subsequently, in a separate thread, the state of
-  the agent will be set to the value of:
-
-  (apply action-fn state-of-agent args)"
-  {:added "1.0"
-   :static true}
-  [^clojure.lang.Agent a f & args]
-  (apply send-via clojure.lang.Agent/soloExecutor a f args))
-
-#_(defn release-pending-sends
-  "Normally, actions sent directly or indirectly during another action
-  are held until the action completes (changes the agent's
-  state). This function can be used to dispatch any pending sent
-  actions immediately. This has no impact on actions sent during a
-  transaction, which are still held until commit. If no action is
-  occurring, does nothing. Returns the number of actions dispatched."
-  {:added "1.0"
-   :static true}
-  [] (clojure.lang.Agent/releasePendingSends))
-
-#_(defn add-watch
-  "Adds a watch function to an agent/atom/var/ref reference. The watch
-  fn must be a fn of 4 args: a key, the reference, its old-state, its
-  new-state. Whenever the reference's state might have been changed,
-  any registered watches will have their functions called. The watch fn
-  will be called synchronously, on the agent's thread if an agent,
-  before any pending sends if agent or ref. Note that an atom's or
-  ref's state may have changed again prior to the fn call, so use
-  old/new-state rather than derefing the reference. Note also that watch
-  fns may be called from multiple threads simultaneously. Var watchers
-  are triggered only by root binding changes, not thread-local
-  set!s. Keys must be unique per reference, and can be used to remove
-  the watch with remove-watch, but are otherwise considered opaque by
-  the watch mechanism."
-  {:added "1.0"
-   :static true}
-  [^clojure.lang.IRef reference key fn] (.addWatch reference key fn))
-
-#_(defn remove-watch
-  "Removes a watch (set by add-watch) from a reference"
-  {:added "1.0"
-   :static true}
-  [^clojure.lang.IRef reference key]
-  (.removeWatch reference key))
-
-#(defn agent-error
-  "Returns the exception thrown during an asynchronous action of the
-  agent if the agent is failed.  Returns nil if the agent is not
-  failed."
-  {:added "1.2"
-   :static true}
-  [^clojure.lang.Agent a] (.getError a))
-
-#_(defn restart-agent
-  "When an agent is failed, changes the agent state to new-state and
-  then un-fails the agent so that sends are allowed again.  If
-  a :clear-actions true option is given, any actions queued on the
-  agent that were being held while it was failed will be discarded,
-  otherwise those held actions will proceed.  The new-state must pass
-  the validator if any, or restart will throw an exception and the
-  agent will remain failed with its old state and error.  Watchers, if
-  any, will NOT be notified of the new state.  Throws an exception if
-  the agent is not failed."
-  {:added "1.2"
-   :static true
-   }
-  [^clojure.lang.Agent a, new-state & options]
-  (let [opts (apply hash-map options)]
-    (.restart a new-state (if (:clear-actions opts) true false))))
-
-#_(defn set-error-handler!
-  "Sets the error-handler of agent a to handler-fn.  If an action
-  being run by the agent throws an exception or doesn't pass the
-  validator fn, handler-fn will be called with two arguments: the
-  agent and the exception."
-  {:added "1.2"
-   :static true}
-  [^clojure.lang.Agent a, handler-fn]
-  (.setErrorHandler a handler-fn))
-
-#_(defn error-handler
-  "Returns the error-handler of agent a, or nil if there is none.
-  See set-error-handler!"
-  {:added "1.2"
-   :static true}
-  [^clojure.lang.Agent a]
-  (.getErrorHandler a))
-
-#_(defn set-error-mode!
-  "Sets the error-mode of agent a to mode-keyword, which must be
-  either :fail or :continue.  If an action being run by the agent
-  throws an exception or doesn't pass the validator fn, an
-  error-handler may be called (see set-error-handler!), after which,
-  if the mode is :continue, the agent will continue as if neither the
-  action that caused the error nor the error itself ever happened.
-  
-  If the mode is :fail, the agent will become failed and will stop
-  accepting new 'send' and 'send-off' actions, and any previously
-  queued actions will be held until a 'restart-agent'.  Deref will
-  still work, returning the state of the agent before the error."
-  {:added "1.2"
-   :static true}
-  [^clojure.lang.Agent a, mode-keyword]
-  (.setErrorMode a mode-keyword))
-
-#_(defn error-mode
-  "Returns the error-mode of agent a.  See set-error-mode!"
-  {:added "1.2"
-   :static true}
-  [^clojure.lang.Agent a]
-  (.getErrorMode a))
-
-#_(defn agent-errors
-  "DEPRECATED: Use 'agent-error' instead.
-  Returns a sequence of the exceptions thrown during asynchronous
-  actions of the agent."
-  {:added "1.0"
-   :deprecated "1.2"}
-  [a]
-  (when-let [e (agent-error a)]
-    (list e)))
-
-#_(defn clear-agent-errors
-  "DEPRECATED: Use 'restart-agent' instead.
-  Clears any exceptions thrown during asynchronous actions of the
-  agent, allowing subsequent actions to occur."
-  {:added "1.0"
-   :deprecated "1.2"}
-  [^clojure.lang.Agent a] (restart-agent a (.deref a)))
-
-#_(defn shutdown-agents
-  "Initiates a shutdown of the thread pools that back the agent
-  system. Running actions will complete, but no new actions will be
-  accepted"
-  {:added "1.0"
-   :static true}
-  [] (. clojure.lang.Agent shutdown))
 
 (defn ref
   "Creates and returns a Ref with an initial value of x and zero or
@@ -2149,7 +1830,7 @@
    :static true
    }
   ([x] (new clojure.lang.Ref x))
-  ([x & options] 
+  ([x & options]
    (let [r  ^clojure.lang.Ref (setup-reference (ref x) options)
          opts (apply hash-map options)]
     (when (:max-history opts)
@@ -2165,7 +1846,7 @@
      (try (.get fut timeout-ms java.util.concurrent.TimeUnit/MILLISECONDS)
           (catch java.util.concurrent.TimeoutException e
             timeout-val))))
-     
+
 (defn deref
   "Also reader macro: @ref/@agent/@var/@atom/@delay/@future/@promise. Within a transaction,
   returns the in-transaction-value of ref, else returns the
@@ -2187,68 +1868,6 @@
        (.deref ^clojure.lang.IBlockingDeref ref timeout-ms timeout-val)
        (deref-future ref timeout-ms timeout-val))))
 
-(defn atom
-  "Creates and returns an Atom with an initial value of x and zero or
-  more options (in any order):
-
-  :meta metadata-map
-
-  :validator validate-fn
-
-  If metadata-map is supplied, it will become the metadata on the
-  atom. validate-fn must be nil or a side-effect-free fn of one
-  argument, which will be passed the intended new state on any state
-  change. If the new state is unacceptable, the validate-fn should
-  return false or throw an exception."
-  {:added "1.0"
-   :static true}
-  ([x] (new clojure.lang.Atom x))
-  ([x & options] (setup-reference (atom x) options)))
-
-(defn swap!
-  "Atomically swaps the value of atom to be:
-  (apply f current-value-of-atom args). Note that f may be called
-  multiple times, and thus should be free of side effects.  Returns
-  the value that was swapped in."
-  {:added "1.0"
-   :static true}
-  ([^clojure.lang.Atom atom f] (.swap atom f))
-  ([^clojure.lang.Atom atom f x] (.swap atom f x))
-  ([^clojure.lang.Atom atom f x y] (.swap atom f x y))
-  ([^clojure.lang.Atom atom f x y & args] (.swap atom f x y args)))
-
-(defn compare-and-set!
-  "Atomically sets the value of atom to newval if and only if the
-  current value of the atom is identical to oldval. Returns true if
-  set happened, else false"
-  {:added "1.0"
-   :static true}
-  [^clojure.lang.Atom atom oldval newval] (.compareAndSet atom oldval newval))
-
-(defn reset!
-  "Sets the value of atom to newval without regard for the
-  current value. Returns newval."
-  {:added "1.0"
-   :static true}
-  [^clojure.lang.Atom atom newval] (.reset atom newval))
-
-(defn set-validator!
-  "Sets the validator-fn for a var/ref/agent/atom. validator-fn must be nil or a
-  side-effect-free fn of one argument, which will be passed the intended
-  new state on any state change. If the new state is unacceptable, the
-  validator-fn should return false or throw an exception. If the current state (root
-  value if var) is not acceptable to the new validator, an exception
-  will be thrown and the validator will not be changed."
-  {:added "1.0"
-   :static true}
-  [^clojure.lang.IRef iref validator-fn] (. iref (setValidator validator-fn)))
-
-(defn get-validator
-  "Gets the validator-fn for a var/ref/agent/atom."
-  {:added "1.0"
-   :static true}
- [^clojure.lang.IRef iref] (. iref (getValidator)))
-
 (defn alter-meta!
   "Atomically sets the metadata for a namespace/var/ref/agent/atom to be:
 
@@ -2259,11 +1878,6 @@
    :static true}
  [^clojure.lang.IReference iref f & args] (.alterMeta iref f args))
 
-(defn reset-meta!
-  "Atomically resets the metadata for a namespace/var/ref/agent/atom"
-  {:added "1.0"
-   :static true}
- [^clojure.lang.IReference iref metadata-map] (.resetMeta iref metadata-map))
 
 (defn commute
   "Must be called in a transaction. Sets the in-transaction-value of
@@ -2286,61 +1900,6 @@
   [^clojure.lang.Ref ref fun & args]
     (. ref (commute fun args)))
 
-(defn alter
-  "Must be called in a transaction. Sets the in-transaction-value of
-  ref to:
-
-  (apply fun in-transaction-value-of-ref args)
-
-  and returns the in-transaction-value of ref."
-  {:added "1.0"
-   :static true}
-  [^clojure.lang.Ref ref fun & args]
-    (. ref (alter fun args)))
-
-(defn ref-set
-  "Must be called in a transaction. Sets the value of ref.
-  Returns val."
-  {:added "1.0"
-   :static true}
-  [^clojure.lang.Ref ref val]
-    (. ref (set val)))
-
-(defn ref-history-count
-  "Returns the history count of a ref"
-  {:added "1.1"
-   :static true}
-  [^clojure.lang.Ref ref]
-    (.getHistoryCount ref))
-
-(defn ref-min-history
-  "Gets the min-history of a ref, or sets it and returns the ref"
-  {:added "1.1"
-   :static true}
-  ([^clojure.lang.Ref ref]
-    (.getMinHistory ref))
-  ([^clojure.lang.Ref ref n]
-    (.setMinHistory ref n)))
-
-(defn ref-max-history
-  "Gets the max-history of a ref, or sets it and returns the ref"
-  {:added "1.1"
-   :static true}
-  ([^clojure.lang.Ref ref]
-    (.getMaxHistory ref))
-  ([^clojure.lang.Ref ref n]
-    (.setMaxHistory ref n)))
-
-(defn ensure
-  "Must be called in a transaction. Protects the ref from modification
-  by other transactions.  Returns the in-transaction-value of
-  ref. Allows for more concurrency than (ref-set ref @ref)"
-  {:added "1.0"
-   :static true}
-  [^clojure.lang.Ref ref]
-    (. ref (touch))
-    (. ref (deref)))
-
 (defmacro sync
   "transaction-flags => TBD, pass nil for now
 
@@ -2354,22 +1913,7 @@
   `(. clojure.lang.LockingTransaction
       (runInTransaction (fn [] ~@body))))
 
-
-(defmacro io!
-  "If an io! block occurs in a transaction, throws an
-  IllegalStateException, else runs body in an implicit do. If the
-  first expression in body is a literal string, will use that as the
-  exception message."
-  {:added "1.0"}
-  [& body]
-  (let [message (when (string? (first body)) (first body))
-        body (if message (next body) body)]
-    `(if (clojure.lang.LockingTransaction/isRunning)
-       (throw (new IllegalStateException ~(or message "I/O in transaction")))
-       (do ~@body))))
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; fn stuff ;;;;;;;;;;;;;;;;
-
 
 (defn comp
   "Takes a set of functions and returns a fn that is the composition
@@ -2380,15 +1924,15 @@
    :static true}
   ([] identity)
   ([f] f)
-  ([f g] 
-     (fn 
+  ([f g]
+     (fn
        ([] (f (g)))
        ([x] (f (g x)))
        ([x y] (f (g x y)))
        ([x y z] (f (g x y z)))
        ([x y z & args] (f (apply g x y z args)))))
-  ([f g h] 
-     (fn 
+  ([f g h]
+     (fn
        ([] (f (g (h))))
        ([x] (f (g (h x))))
        ([x y] (f (g (h x y))))
@@ -2401,44 +1945,6 @@
           (if fs
             (recur ((first fs) ret) (next fs))
             ret))))))
-
-(defn juxt 
-  "Takes a set of functions and returns a fn that is the juxtaposition
-  of those fns.  The returned fn takes a variable number of args, and
-  returns a vector containing the result of applying each fn to the
-  args (left-to-right).
-  ((juxt a b c) x) => [(a x) (b x) (c x)]"
-  {:added "1.1"
-   :static true}
-  ([f] 
-     (fn
-       ([] [(f)])
-       ([x] [(f x)])
-       ([x y] [(f x y)])
-       ([x y z] [(f x y z)])
-       ([x y z & args] [(apply f x y z args)])))
-  ([f g] 
-     (fn
-       ([] [(f) (g)])
-       ([x] [(f x) (g x)])
-       ([x y] [(f x y) (g x y)])
-       ([x y z] [(f x y z) (g x y z)])
-       ([x y z & args] [(apply f x y z args) (apply g x y z args)])))
-  ([f g h] 
-     (fn
-       ([] [(f) (g) (h)])
-       ([x] [(f x) (g x) (h x)])
-       ([x y] [(f x y) (g x y) (h x y)])
-       ([x y z] [(f x y z) (g x y z) (h x y z)])
-       ([x y z & args] [(apply f x y z args) (apply g x y z args) (apply h x y z args)])))
-  ([f g h & fs]
-     (let [fs (list* f g h fs)]
-       (fn
-         ([] (reduce1 #(conj %1 (%2)) [] fs))
-         ([x] (reduce1 #(conj %1 (%2 x)) [] fs))
-         ([x y] (reduce1 #(conj %1 (%2 x y)) [] fs))
-         ([x y z] (reduce1 #(conj %1 (%2 x y z)) [] fs))
-         ([x y z & args] (reduce1 #(conj %1 (apply %2 x y z args)) [] fs))))))
 
 (defn partial
   "Takes a function f and fewer than the normal arguments to f, and
