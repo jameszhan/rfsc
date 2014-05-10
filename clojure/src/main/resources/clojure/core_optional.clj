@@ -6,7 +6,59 @@
 
 
 
+#_(defn create-struct
+    "Returns a structure basis object."
+    {:added "1.0"
+     :static true}
+    [& keys]
+    (. clojure.lang.PersistentStructMap (createSlotMap keys)))
 
+#_(defmacro defstruct
+    "Same as (def name (create-struct keys...))"
+    {:added "1.0"
+     :static true}
+    [name & keys]
+    `(def ~name (create-struct ~@keys)))
+
+#_(defn struct-map
+    "Returns a new structmap instance with the keys of the
+    structure-basis. keyvals may contain all, some or none of the basis
+    keys - where values are not supplied they will default to nil.
+    keyvals can also contain keys not in the basis."
+    {:added "1.0"
+     :static true}
+    [s & inits]
+    (. clojure.lang.PersistentStructMap (create s inits)))
+
+#_(defn struct
+    "Returns a new structmap instance with the keys of the
+    structure-basis. vals must be supplied for basis keys in order -
+    where values are not supplied they will default to nil."
+    {:added "1.0"
+     :static true}
+    [s & vals]
+    (. clojure.lang.PersistentStructMap (construct s vals)))
+
+#_(defn accessor
+    "Returns a fn that, given an instance of a structmap with the basis,
+    returns the value at the key.  The key must be in the basis. The
+    returned function should be (slightly) more efficient than using
+    get, but such use of accessors should be limited to known
+    performance-critical areas."
+    {:added "1.0"
+     :static true}
+    [s key]
+    (. clojure.lang.PersistentStructMap (getAccessor s key)))
+
+#_(defn load-string
+    "Sequentially read and evaluate the set of forms contained in the
+    string"
+    {:added "1.0"
+     :static true}
+    [s]
+    (let [rdr (-> (java.io.StringReader. s)
+                (clojure.lang.LineNumberingPushbackReader.))]
+      (load-reader rdr)))
 
 #_(defn ns-refers
     "Returns a map of the refer mappings for the namespace."

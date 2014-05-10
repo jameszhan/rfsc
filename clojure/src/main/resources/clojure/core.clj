@@ -3697,66 +3697,12 @@
         form
         (macroexpand ex))))
 
-(defn create-struct
-  "Returns a structure basis object."
-  {:added "1.0"
-   :static true}
-  [& keys]
-    (. clojure.lang.PersistentStructMap (createSlotMap keys)))
-
-(defmacro defstruct
-  "Same as (def name (create-struct keys...))"
-  {:added "1.0"
-   :static true}
-  [name & keys]
-  `(def ~name (create-struct ~@keys)))
-
-(defn struct-map
-  "Returns a new structmap instance with the keys of the
-  structure-basis. keyvals may contain all, some or none of the basis
-  keys - where values are not supplied they will default to nil.
-  keyvals can also contain keys not in the basis."
-  {:added "1.0"
-   :static true}
-  [s & inits]
-    (. clojure.lang.PersistentStructMap (create s inits)))
-
-(defn struct
-  "Returns a new structmap instance with the keys of the
-  structure-basis. vals must be supplied for basis keys in order -
-  where values are not supplied they will default to nil."
-  {:added "1.0"
-   :static true}
-  [s & vals]
-    (. clojure.lang.PersistentStructMap (construct s vals)))
-
-(defn accessor
-  "Returns a fn that, given an instance of a structmap with the basis,
-  returns the value at the key.  The key must be in the basis. The
-  returned function should be (slightly) more efficient than using
-  get, but such use of accessors should be limited to known
-  performance-critical areas."
-  {:added "1.0"
-   :static true}
-  [s key]
-    (. clojure.lang.PersistentStructMap (getAccessor s key)))
-
 (defn load-reader
   "Sequentially read and evaluate the set of forms contained in the
   stream/file"
   {:added "1.0"
    :static true}
   [rdr] (. clojure.lang.Compiler (load rdr)))
-
-(defn load-string
-  "Sequentially read and evaluate the set of forms contained in the
-  string"
-  {:added "1.0"
-   :static true}
-  [s]
-  (let [rdr (-> (java.io.StringReader. s)
-                (clojure.lang.LineNumberingPushbackReader.))]
-    (load-reader rdr)))
 
 (defn set
   "Returns a set of the distinct elements of coll."
@@ -3819,14 +3765,14 @@
   [ns]
   (.getName (the-ns ns)))
 
-#_(defn ns-map
+(defn ns-map
   "Returns a map of all the mappings for the namespace."
   {:added "1.0"
    :static true}
   [ns]
   (.getMappings (the-ns ns)))
 
-#_(defn ns-unmap
+(defn ns-unmap
   "Removes the mappings for the symbol from the namespace."
   {:added "1.0"
    :static true}
@@ -3837,7 +3783,7 @@
 ;  (doseq [sym syms]
 ;   (.. *ns* (intern sym) (setExported true))))
 
-#_(defn ns-publics
+(defn ns-publics
   "Returns a map of the public intern mappings for the namespace."
   {:added "1.0"
    :static true}
@@ -3848,14 +3794,14 @@
                                  (.isPublic v)))
                 (ns-map ns))))
 
-#_(defn ns-imports
+(defn ns-imports
   "Returns a map of the import mappings for the namespace."
   {:added "1.0"
    :static true}
   [ns]
   (filter-key val (partial instance? Class) (ns-map ns)))
 
-#_(defn ns-interns
+(defn ns-interns
   "Returns a map of the intern mappings for the namespace."
   {:added "1.0"
    :static true}
