@@ -4,6 +4,67 @@
 
 
 
+;;;;;;;;;;;;;;;;;;; sequence fns  ;;;;;;;;;;;;;;;;;;;;;;;
+#_(defn sequence
+    "Coerces coll to a (possibly empty) sequence, if it is not already
+    one. Will not force a lazy seq. (sequence nil) yields ()"
+    {:added "1.0"
+     :static true}
+    [coll]
+    (if (seq? coll) coll
+      (or (seq coll) ())))
+
+#_(def
+    ^{:tag Boolean
+      :doc "Returns false if (pred x) is logical true for every x in
+  coll, else true."
+      :arglists '([pred coll])
+      :added "1.0"}
+    not-every? (comp not every?))
+
+#_(defn drop-last
+    "Return a lazy sequence of all but the last n (default 1) items in coll"
+    {:added "1.0"
+     :static true}
+    ([s] (drop-last 1 s))
+    ([n s] (map (fn [x _] x) s (drop n s))))
+
+#_(defn take-last
+    "Returns a seq of the last n items in coll.  Depending on the type
+    of coll may be no better than linear time.  For vectors, see also subvec."
+    {:added "1.1"
+     :static true}
+    [n coll]
+    (loop [s (seq coll), lead (seq (drop n coll))]
+      (if lead
+        (recur (next s) (next lead))
+        s)))
+
+#_(defn cycle
+    "Returns a lazy (infinite!) sequence of repetitions of the items in coll."
+    {:added "1.0"
+     :static true}
+    [coll] (lazy-seq
+             (when-let [s (seq coll)]
+               (concat s (cycle s)))))
+
+#_(defn split-at
+    "Returns a vector of [(take n coll) (drop n coll)]"
+    {:added "1.0"
+     :static true}
+    [n coll]
+    [(take n coll) (drop n coll)])
+
+#_(defn split-with
+    "Returns a vector of [(take-while pred coll) (drop-while pred coll)]"
+    {:added "1.0"
+     :static true}
+    [pred coll]
+    [(take-while pred coll) (drop-while pred coll)])
+
+
+
+
 
 (defn iterate
     "Returns a lazy sequence of x, (f x), (f (f x)) etc. f must be free of side-effects"

@@ -2457,14 +2457,6 @@
    (fn [& args] (apply f arg1 arg2 arg3 (concat more args)))))
 
 ;;;;;;;;;;;;;;;;;;; sequence fns  ;;;;;;;;;;;;;;;;;;;;;;;
-(defn sequence
-  "Coerces coll to a (possibly empty) sequence, if it is not already
-  one. Will not force a lazy seq. (sequence nil) yields ()"
-  {:added "1.0"
-   :static true}
-  [coll]
-   (if (seq? coll) coll
-    (or (seq coll) ())))
 
 (defn every?
   "Returns true if (pred x) is logical true for every x in coll, else
@@ -2478,13 +2470,6 @@
    (pred (first coll)) (recur pred (next coll))
    :else false))
 
-(def
- ^{:tag Boolean
-   :doc "Returns false if (pred x) is logical true for every x in
-  coll, else true."
-   :arglists '([pred coll])
-   :added "1.0"}
- not-every? (comp not every?))
 
 (defn some
   "Returns the first logical true value of (pred x) for any x in coll,
@@ -2632,24 +2617,6 @@
                    s)))]
     (lazy-seq (step n coll))))
 
-(defn drop-last
-  "Return a lazy sequence of all but the last n (default 1) items in coll"
-  {:added "1.0"
-   :static true}
-  ([s] (drop-last 1 s))
-  ([n s] (map (fn [x _] x) s (drop n s))))
-
-(defn take-last
-  "Returns a seq of the last n items in coll.  Depending on the type
-  of coll may be no better than linear time.  For vectors, see also subvec."
-  {:added "1.1"
-   :static true}
-  [n coll]
-  (loop [s (seq coll), lead (seq (drop n coll))]
-    (if lead
-      (recur (next s) (next lead))
-      s)))
-
 (defn drop-while
   "Returns a lazy sequence of the items in coll starting from the first
   item for which (pred item) returns logical false."
@@ -2663,27 +2630,6 @@
                    s)))]
     (lazy-seq (step pred coll))))
 
-(defn cycle
-  "Returns a lazy (infinite!) sequence of repetitions of the items in coll."
-  {:added "1.0"
-   :static true}
-  [coll] (lazy-seq 
-          (when-let [s (seq coll)] 
-              (concat s (cycle s)))))
-
-(defn split-at
-  "Returns a vector of [(take n coll) (drop n coll)]"
-  {:added "1.0"
-   :static true}
-  [n coll]
-    [(take n coll) (drop n coll)])
-
-(defn split-with
-  "Returns a vector of [(take-while pred coll) (drop-while pred coll)]"
-  {:added "1.0"
-   :static true}
-  [pred coll]
-    [(take-while pred coll) (drop-while pred coll)])
 
 (defn repeat
   "Returns a lazy (infinite!, or length n if supplied) sequence of xs."
