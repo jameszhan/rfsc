@@ -3459,26 +3459,6 @@
   ([stream eof-error? eof-value recursive?]
    (. clojure.lang.LispReader (read stream (boolean eof-error?) eof-value recursive?))))
 
-(defn read-line
-  "Reads the next line from stream that is the current value of *in* ."
-  {:added "1.0"
-   :static true}
-  []
-  (if (instance? clojure.lang.LineNumberingPushbackReader *in*)
-    (.readLine ^clojure.lang.LineNumberingPushbackReader *in*)
-    (.readLine ^java.io.BufferedReader *in*)))
-
-(defn read-string
-  "Reads one object from the string s.
-
-  Note that read-string can execute code (controlled by *read-eval*),
-  and as such should be used only with trusted sources.
-
-  For data structure interop use clojure.edn/read-string"
-  {:added "1.0"
-   :static true}
-  [s] (clojure.lang.RT/readString s))
-
 (defn subvec
   "Returns a persistent vector of the items in vector from
   start (inclusive) to end (exclusive).  If end is not supplied,
@@ -3530,31 +3510,6 @@
                 forms)
          ~gx)))
 
-(defmacro memfn
-  "Expands into code that creates a fn that expects to be passed an
-  object and any args and calls the named instance method on the
-  object passing the args. Use when you want to treat a Java method as
-  a first-class fn. name may be type-hinted with the method receiver's
-  type in order to avoid reflective calls."
-  {:added "1.0"}
-  [name & args]
-  (let [t (with-meta (gensym "target")
-            (meta name))]
-    `(fn [~t ~@args]
-       (. ~t (~name ~@args)))))
-
-(defmacro time
-  "Evaluates expr and prints the time it took.  Returns the value of
- expr."
-  {:added "1.0"}
-  [expr]
-  `(let [start# (. System (nanoTime))
-         ret# ~expr]
-     (prn (str "Elapsed time: " (/ (double (- (. System (nanoTime)) start#)) 1000000.0) " msecs"))
-     ret#))
-
-
-
 (import '(java.lang.reflect Array))
 
 (defn alength
@@ -3563,13 +3518,6 @@
   {:inline (fn [a] `(. clojure.lang.RT (alength ~a)))
    :added "1.0"}
   [array] (. clojure.lang.RT (alength array)))
-
-(defn aclone
-  "Returns a clone of the Java array. Works on arrays of known
-  types."
-  {:inline (fn [a] `(. clojure.lang.RT (aclone ~a)))
-   :added "1.0"}
-  [array] (. clojure.lang.RT (aclone array)))
 
 (defn aget
   "Returns the value at the index/indices. Works on Java arrays of all
@@ -3581,18 +3529,6 @@
    (clojure.lang.Reflector/prepRet (.getComponentType (class array)) (. Array (get array idx))))
   ([array idx & idxs]
    (apply aget (aget array idx) idxs)))
-
-(defn aset
-  "Sets the value at the index/indices. Works on Java arrays of
-  reference types. Returns val."
-  {:inline (fn [a i v] `(. clojure.lang.RT (aset ~a (int ~i) ~v)))
-   :inline-arities #{3}
-   :added "1.0"}
-  ([array idx val]
-   (. Array (set array idx val))
-   val)
-  ([array idx idx2 & idxv]
-   (apply aset (aget array idx) idx2 idxv)))
 
 (defmacro
   ^{:private true}
@@ -3610,41 +3546,6 @@
     :added "1.0"}
   aset-int setInt int)
 
-(def-aset
-  ^{:doc "Sets the value at the index/indices. Works on arrays of long. Returns val."
-    :added "1.0"}
-  aset-long setLong long)
-
-(def-aset
-  ^{:doc "Sets the value at the index/indices. Works on arrays of boolean. Returns val."
-    :added "1.0"}
-  aset-boolean setBoolean boolean)
-
-(def-aset
-  ^{:doc "Sets the value at the index/indices. Works on arrays of float. Returns val."
-    :added "1.0"}
-  aset-float setFloat float)
-
-(def-aset
-  ^{:doc "Sets the value at the index/indices. Works on arrays of double. Returns val."
-    :added "1.0"}
-  aset-double setDouble double)
-
-(def-aset
-  ^{:doc "Sets the value at the index/indices. Works on arrays of short. Returns val."
-    :added "1.0"}
-  aset-short setShort short)
-
-(def-aset
-  ^{:doc "Sets the value at the index/indices. Works on arrays of byte. Returns val."
-    :added "1.0"}
-  aset-byte setByte byte)
-
-(def-aset
-  ^{:doc "Sets the value at the index/indices. Works on arrays of char. Returns val."
-    :added "1.0"}
-  aset-char setChar char)
-
 (defn make-array
   "Creates and returns an array of instances of the specified class of
   the specified dimension(s).  Note that a class object is required.
@@ -3661,21 +3562,6 @@
      (dotimes [i (alength dimarray)]
        (aset-int dimarray i (nth dims i)))
      (. Array (newInstance type dimarray)))))
-
-(defn to-array-2d
-  "Returns a (potentially-ragged) 2-dimensional array of Objects
-  containing the contents of coll, which can be any Collection of any
-  Collection."
-  {:tag "[[Ljava.lang.Object;"
-   :added "1.0"
-   :static true}
-  [^java.util.Collection coll]
-    (let [ret (make-array (. Class (forName "[Ljava.lang.Object;")) (. coll (size)))]
-      (loop [i 0 xs (seq coll)]
-        (when xs
-          (aset ret i (to-array (first xs)))
-          (recur (inc i) (next xs))))
-      ret))
 
 (defn macroexpand-1
   "If form represents a macro form, returns its expansion,
