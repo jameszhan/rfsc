@@ -7,6 +7,129 @@
 
 
 
+
+#_(defn ns-refers
+    "Returns a map of the refer mappings for the namespace."
+    {:added "1.0"
+     :static true}
+    [ns]
+    (let [ns (the-ns ns)]
+      (filter-key val (fn [^clojure.lang.Var v] (and (instance? clojure.lang.Var v)
+                                                  (not= ns (.ns v))))
+        (ns-map ns))))
+
+#_(defn ns-aliases
+    "Returns a map of the aliases for the namespace."
+    {:added "1.0"
+     :static true}
+    [ns]
+    (.getAliases (the-ns ns)))
+
+#_(defn ns-unalias
+    "Removes the alias for the symbol from the namespace."
+    {:added "1.0"
+     :static true}
+    [ns sym]
+    (.removeAlias (the-ns ns) sym))
+
+#_(defn var-get
+    "Gets the value in the var object"
+    {:added "1.0"
+     :static true}
+    [^clojure.lang.Var x] (. x (get)))
+
+#_(defn var-set
+    "Sets the value in the var object to val. The var must be
+   thread-locally bound."
+    {:added "1.0"
+     :static true}
+    [^clojure.lang.Var x val] (. x (set val)))
+
+#_(defmacro with-local-vars
+    "varbinding=> symbol init-expr
+
+    Executes the exprs in a context in which the symbols are bound to
+    vars with per-thread bindings to the init-exprs.  The symbols refer
+    to the var objects themselves, and must be accessed with var-get and
+    var-set"
+    {:added "1.0"}
+    [name-vals-vec & body]
+    (assert-args
+      (vector? name-vals-vec) "a vector for its binding"
+      (even? (count name-vals-vec)) "an even number of forms in binding vector")
+    `(let [~@(interleave (take-nth 2 name-vals-vec)
+               (repeat '(.. clojure.lang.Var create setDynamic)))]
+       (. clojure.lang.Var (pushThreadBindings (hash-map ~@name-vals-vec)))
+       (try
+         ~@body
+         (finally (. clojure.lang.Var (popThreadBindings))))))
+
+#_(defn array-map
+    "Constructs an array-map. If any keys are equal, they are handled as
+    if by repeated uses of assoc."
+    {:added "1.0"
+     :static true}
+    ([] (. clojure.lang.PersistentArrayMap EMPTY))
+    ([& keyvals]
+      (clojure.lang.PersistentArrayMap/createAsIfByAssoc (to-array keyvals))))
+
+(defmacro comment
+  "Ignores body, yields nil"
+  {:added "1.0"}
+  [& body])
+
+(defmacro lazy-cat
+    "Expands to code which yields a lazy sequence of the concatenation
+    of the supplied colls.  Each coll expr is not evaluated until it is
+    needed.
+
+    (lazy-cat xs ys zs) === (concat (lazy-seq xs) (lazy-seq ys) (lazy-seq zs))"
+    {:added "1.0"}
+    [& colls]
+    `(concat ~@(map #(list `lazy-seq %) colls)))
+
+(defn prn-str
+  "prn to a string, returning it"
+  {:tag String
+   :added "1.0"
+   :static true}
+  [& xs]
+  (with-out-str
+    (apply prn xs)))
+
+(defn println-str
+  "println to a string, returning it"
+  {:tag String
+   :added "1.0"
+   :static true}
+  [& xs]
+  (with-out-str
+    (apply println xs)))
+
+(defmacro assert
+  "Evaluates expr and throws an exception if it does not evaluate to
+  logical true."
+  {:added "1.0"}
+  ([x]
+    (when *assert*
+      `(when-not ~x
+         (throw (new AssertionError (str "Assert failed: " (pr-str '~x)))))))
+  ([x message]
+    (when *assert*
+      `(when-not ~x
+         (throw (new AssertionError (str "Assert failed: " ~message "\n" (pr-str '~x))))))))
+
+(defn test
+  "test [v] finds fn at key :test in var metadata and calls it,
+  presuming failure will throw exception"
+  {:added "1.0"}
+  [v]
+  (let [f (:test (meta v))]
+    (if f
+      (do (f) :ok)
+      :no-test)))
+
+
 (defn re-seq
   "Returns a lazy sequence of successive matches of pattern in string,
   using java.util.regex.Matcher.find(), each such match processed with
@@ -18,8 +141,6 @@
     ((fn step []
        (when (. m (find))
          (cons (re-groups m) (lazy-seq (step))))))))
-
-
 
 (defn rand
   "Returns a random floating point number between 0 (inclusive) and

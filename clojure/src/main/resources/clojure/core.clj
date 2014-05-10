@@ -3819,14 +3819,14 @@
   [ns]
   (.getName (the-ns ns)))
 
-(defn ns-map
+#_(defn ns-map
   "Returns a map of all the mappings for the namespace."
   {:added "1.0"
    :static true}
   [ns]
   (.getMappings (the-ns ns)))
 
-(defn ns-unmap
+#_(defn ns-unmap
   "Removes the mappings for the symbol from the namespace."
   {:added "1.0"
    :static true}
@@ -3837,7 +3837,7 @@
 ;  (doseq [sym syms]
 ;   (.. *ns* (intern sym) (setExported true))))
 
-(defn ns-publics
+#_(defn ns-publics
   "Returns a map of the public intern mappings for the namespace."
   {:added "1.0"
    :static true}
@@ -3848,14 +3848,14 @@
                                  (.isPublic v)))
                 (ns-map ns))))
 
-(defn ns-imports
+#_(defn ns-imports
   "Returns a map of the import mappings for the namespace."
   {:added "1.0"
    :static true}
   [ns]
   (filter-key val (partial instance? Class) (ns-map ns)))
 
-(defn ns-interns
+#_(defn ns-interns
   "Returns a map of the intern mappings for the namespace."
   {:added "1.0"
    :static true}
@@ -3902,16 +3902,6 @@
                             (str sym " does not exist")))))
             (. *ns* (refer (or (rename sym) sym) v)))))))
 
-#_(defn ns-refers
-  "Returns a map of the refer mappings for the namespace."
-  {:added "1.0"
-   :static true}
-  [ns]
-  (let [ns (the-ns ns)]
-    (filter-key val (fn [^clojure.lang.Var v] (and (instance? clojure.lang.Var v)
-                                 (not= ns (.ns v))))
-                (ns-map ns))))
-
 (defn alias
   "Add an alias in the current namespace to another
   namespace. Arguments are two symbols: the alias to be used, and
@@ -3921,20 +3911,6 @@
    :static true}
   [alias namespace-sym]
   (.addAlias *ns* alias (the-ns namespace-sym)))
-
-#_(defn ns-aliases
-  "Returns a map of the aliases for the namespace."
-  {:added "1.0"
-   :static true}
-  [ns]
-  (.getAliases (the-ns ns)))
-
-#_(defn ns-unalias
-  "Removes the alias for the symbol from the namespace."
-  {:added "1.0"
-   :static true}
-  [ns sym]
-  (.removeAlias (the-ns ns) sym))
 
 (defn take-nth
   "Returns a lazy seq of every nth item in coll."
@@ -3963,37 +3939,6 @@
         (when (every? identity ss)
           (concat (map first ss) (apply interleave (map rest ss))))))))
 
-(defn var-get
-  "Gets the value in the var object"
-  {:added "1.0"
-   :static true}
-  [^clojure.lang.Var x] (. x (get)))
-
-(defn var-set
-  "Sets the value in the var object to val. The var must be
- thread-locally bound."
-  {:added "1.0"
-   :static true}
-  [^clojure.lang.Var x val] (. x (set val)))
-
-(defmacro with-local-vars
-  "varbinding=> symbol init-expr
-
-  Executes the exprs in a context in which the symbols are bound to
-  vars with per-thread bindings to the init-exprs.  The symbols refer
-  to the var objects themselves, and must be accessed with var-get and
-  var-set"
-  {:added "1.0"}
-  [name-vals-vec & body]
-  (assert-args
-     (vector? name-vals-vec) "a vector for its binding"
-     (even? (count name-vals-vec)) "an even number of forms in binding vector")
-  `(let [~@(interleave (take-nth 2 name-vals-vec)
-                       (repeat '(.. clojure.lang.Var create setDynamic)))]
-     (. clojure.lang.Var (pushThreadBindings (hash-map ~@name-vals-vec)))
-     (try
-      ~@body
-      (finally (. clojure.lang.Var (popThreadBindings))))))
 
 (defn ns-resolve
   "Returns the var or Class to which a symbol will be resolved in the
@@ -4015,14 +3960,6 @@
   ([sym] (ns-resolve *ns* sym))
   ([env sym] (ns-resolve *ns* env sym)))
 
-(defn array-map
-  "Constructs an array-map. If any keys are equal, they are handled as
-  if by repeated uses of assoc."
-  {:added "1.0"
-   :static true}
-  ([] (. clojure.lang.PersistentArrayMap EMPTY))
-  ([& keyvals]
-     (clojure.lang.PersistentArrayMap/createAsIfByAssoc (to-array keyvals))))
 
 ;redefine let and loop  with destructuring
 (defn destructure [bindings]
@@ -4224,16 +4161,6 @@
        (let [~x (first xs#)]
            ~@body))))
 
-(defmacro lazy-cat
-  "Expands to code which yields a lazy sequence of the concatenation
-  of the supplied colls.  Each coll expr is not evaluated until it is
-  needed. 
-
-  (lazy-cat xs ys zs) === (concat (lazy-seq xs) (lazy-seq ys) (lazy-seq zs))"
-  {:added "1.0"}
-  [& colls]
-  `(concat ~@(map #(list `lazy-seq %) colls)))
-
 (defmacro for
   "List comprehension. Takes a vector of one or more
    binding-form/collection-expr pairs, each followed by zero or more
@@ -4321,11 +4248,6 @@
     `(let [iter# ~(emit-bind (to-groups seq-exprs))]
         (iter# ~(second seq-exprs)))))
 
-(defmacro comment
-  "Ignores body, yields nil"
-  {:added "1.0"}
-  [& body])
-
 (defmacro with-out-str
   "Evaluates exprs in a context in which *out* is bound to a fresh
   StringWriter.  Returns the string created by any nested printing
@@ -4352,17 +4274,8 @@
    :added "1.0"
    :static true}
   [& xs]
-    (with-out-str
-     (apply pr xs)))
-
-(defn prn-str
-  "prn to a string, returning it"
-  {:tag String
-   :added "1.0"
-   :static true}
-  [& xs]
   (with-out-str
-   (apply prn xs)))
+    (apply pr xs)))
 
 (defn print-str
   "print to a string, returning it"
@@ -4370,17 +4283,9 @@
    :added "1.0"
    :static true}
   [& xs]
-    (with-out-str
-     (apply print xs)))
+  (with-out-str
+    (apply print xs)))
 
-(defn println-str
-  "println to a string, returning it"
-  {:tag String
-   :added "1.0"
-   :static true}
-  [& xs]
-    (with-out-str
-     (apply println xs)))
 
 (import clojure.lang.ExceptionInfo clojure.lang.IExceptionInfo)
 (defn ex-info
@@ -4388,9 +4293,9 @@
    that carries a map of additional data."
   {:added "1.4"}
   ([msg map]
-     (ExceptionInfo. msg map))
+    (ExceptionInfo. msg map))
   ([msg map cause]
-     (ExceptionInfo. msg map cause)))
+    (ExceptionInfo. msg map cause)))
 
 (defn ex-data
   "Returns exception data (a map) if ex is an IExceptionInfo.
@@ -4399,31 +4304,6 @@
   [ex]
   (when (instance? IExceptionInfo ex)
     (.getData ^IExceptionInfo ex)))
-
-(defmacro assert
-  "Evaluates expr and throws an exception if it does not evaluate to
-  logical true."
-  {:added "1.0"}
-  ([x]
-     (when *assert*
-       `(when-not ~x
-          (throw (new AssertionError (str "Assert failed: " (pr-str '~x)))))))
-  ([x message]
-     (when *assert*
-       `(when-not ~x
-          (throw (new AssertionError (str "Assert failed: " ~message "\n" (pr-str '~x))))))))
-
-(defn test
-  "test [v] finds fn at key :test in var metadata and calls it,
-  presuming failure will throw exception"
-  {:added "1.0"}
-  [v]
-    (let [f (:test (meta v))]
-      (if f
-        (do (f) :ok)
-        :no-test)))
-
-
 
 (defn re-pattern
   "Returns an instance of java.util.regex.Pattern, for use, e.g. in
