@@ -4495,75 +4495,12 @@
    (let [m (re-matcher re s)]
      (re-find m))))
 
-(defn rand
-  "Returns a random floating point number between 0 (inclusive) and
-  n (default 1) (exclusive)."
-  {:added "1.0"
-   :static true}
-  ([] (. Math (random)))
-  ([n] (* n (rand))))
-
-(defn rand-int
-  "Returns a random integer between 0 (inclusive) and n (exclusive)."
-  {:added "1.0"
-   :static true}
-  [n] (int (rand n)))
-
 (defmacro defn-
   "same as defn, yielding non-public def"
   {:added "1.0"}
   [name & decls]
     (list* `defn (with-meta name (assoc (meta name) :private true)) decls))
 
-(defn tree-seq
-  "Returns a lazy sequence of the nodes in a tree, via a depth-first walk.
-   branch? must be a fn of one arg that returns true if passed a node
-   that can have children (but may not).  children must be a fn of one
-   arg that returns a sequence of the children. Will only be called on
-   nodes for which branch? returns true. Root is the root node of the
-  tree."
-  {:added "1.0"
-   :static true}
-   [branch? children root]
-   (let [walk (fn walk [node]
-                (lazy-seq
-                 (cons node
-                  (when (branch? node)
-                    (mapcat walk (children node))))))]
-     (walk root)))
-
-(defn file-seq
-  "A tree seq on java.io.Files"
-  {:added "1.0"
-   :static true}
-  [dir]
-    (tree-seq
-     (fn [^java.io.File f] (. f (isDirectory)))
-     (fn [^java.io.File d] (seq (. d (listFiles))))
-     dir))
-
-(defn xml-seq
-  "A tree seq on the xml elements as per xml/parse"
-  {:added "1.0"
-   :static true}
-  [root]
-    (tree-seq
-     (complement string?)
-     (comp seq :content)
-     root))
-
-(defn special-symbol?
-  "Returns true if s names a special form"
-  {:added "1.0"
-   :static true}
-  [s]
-    (contains? (. clojure.lang.Compiler specials) s))
-
-(defn var?
-  "Returns true if v is of type clojure.lang.Var"
-  {:added "1.0"
-   :static true}
-  [v] (instance? clojure.lang.Var v))
 
 (defn subs
   "Returns the substring of s beginning at start inclusive, and ending
@@ -4572,8 +4509,6 @@
    :static true}
   (^String [^String s start] (. s (substring start)))
   (^String [^String s start end] (. s (substring start end))))
-
-
 
 
 (defmacro dosync
@@ -4645,6 +4580,39 @@
                (if (class? tag)
                  (into1 (set (bases tag)) tp)
                  tp)))))
+
+(defn supers
+  "Returns the immediate and indirect superclasses and interfaces of c, if any"
+  {:added "1.0"
+   :static true}
+  [^Class class]
+  (loop [ret (set (bases class)) cs ret]
+    (if (seq cs)
+      (let [c (first cs) bs (bases c)]
+        (recur (into1 ret bs) (into1 (disj cs c) bs)))
+      (not-empty ret))))
+
+
+(defn isa?
+  "Returns true if (= child parent), or child is directly or indirectly derived from
+  parent, either via a Java type inheritance relationship or a
+  relationship established via derive. h must be a hierarchy obtained
+  from make-hierarchy, if not supplied defaults to the global
+  hierarchy"
+  {:added "1.0"}
+  ([child parent] (isa? global-hierarchy child parent))
+  ([h child parent]
+    (or (= child parent)
+      (and (class? parent) (class? child)
+        (. ^Class parent isAssignableFrom child))
+      (contains? ((:ancestors h) child) parent)
+      (and (class? child) (some #(contains? ((:ancestors h) %) parent) (supers child)))
+      (and (vector? parent) (vector? child)
+        (= (count parent) (count child))
+        (loop [ret true i 0]
+          (if (or (not ret) (= i (count parent)))
+            ret
+            (recur (isa? h (child i) (parent i)) (inc i))))))))
 
 (defn format
   "Formats a string using java.lang.String.format, see java.util.Formatter for format
@@ -5169,7 +5137,7 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; helper files ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (alter-meta! (find-ns 'clojure.core) assoc :doc "Fundamental library of the Clojure language")
-(load "core_proxy")   ;;TODO it can be removed, but some funcationalities will not working
+(load "core_proxy")   ;;TODO it can be removed, but some functionalities will not working
 (load "core_print")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; clojure version number ;;;;;;;;;;;;;;;;;;;;;;
