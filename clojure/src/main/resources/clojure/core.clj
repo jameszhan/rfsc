@@ -5473,25 +5473,6 @@
 
 ;;;;;;;;;;;;; nested associative ops ;;;;;;;;;;;
 
-#_(defn get-in
-  "Returns the value in a nested associative structure,
-  where ks is a sequence of keys. Returns nil if the key
-  is not present, or the not-found value if supplied."
-  {:added "1.2"
-   :static true}
-  ([m ks]
-     (reduce1 get m ks))
-  ([m ks not-found]
-     (loop [sentinel (Object.)
-            m m
-            ks (seq ks)]
-       (if ks
-         (let [m (get m (first ks) sentinel)]
-           (if (identical? sentinel m)
-             not-found
-             (recur sentinel m (next ks))))
-         m))))
-
 (defn assoc-in
   "Associates a value in a nested associative structure, where ks is a
   sequence of keys and v is the new value and returns a new nested structure.
@@ -5503,18 +5484,6 @@
     (assoc m k (assoc-in (get m k) ks v))
     (assoc m k v)))
 
-#_(defn update-in
-  "'Updates' a value in a nested associative structure, where ks is a
-  sequence of keys and f is a function that will take the old value
-  and any supplied args and return the new value, and returns a new
-  nested structure.  If any levels do not exist, hash-maps will be
-  created."
-  {:added "1.0"
-   :static true}
-  ([m [k & ks] f & args]
-   (if ks
-     (assoc m k (apply update-in (get m k) ks f args))
-     (assoc m k (apply f (get m k) args)))))
 
 
 #_(defn empty?
@@ -5606,23 +5575,6 @@
    :added "1.0"}
  *e)
 
-#_(defn trampoline
-  "trampoline can be used to convert algorithms requiring mutual
-  recursion without stack consumption. Calls f with supplied args, if
-  any. If f returns a fn, calls that fn with no arguments, and
-  continues to repeat, until the return value is not a fn, then
-  returns that non-fn value. Note that if you want to return a fn as a
-  final value, you must wrap it in some data structure and unpack it
-  after trampoline returns."
-  {:added "1.0"
-   :static true}
-  ([f]
-     (let [ret (f)]
-       (if (fn? ret)
-         (recur ret)
-         ret)))
-  ([f & args]
-     (trampoline #(apply f args))))
 
 (defn intern
   "Finds or creates a var named by the symbol name in the namespace
@@ -5640,31 +5592,7 @@
        (when (meta name) (.setMeta v (meta name)))
        v)))
 
-#_(defmacro while
-  "Repeatedly executes body while test expression is true. Presumes
-  some side-effect will cause test to become false/nil. Returns nil"
-  {:added "1.0"}
-  [test & body]
-  `(loop []
-     (when ~test
-       ~@body
-       (recur))))
 
-#_(defn memoize
-  "Returns a memoized version of a referentially transparent function. The
-  memoized version of the function keeps a cache of the mapping from arguments
-  to results and, when calls with the same arguments are repeated often, has
-  higher performance at the expense of higher memory use."
-  {:added "1.0"
-   :static true}
-  [f]
-  (let [mem (atom {})]
-    (fn [& args]
-      (if-let [e (find @mem args)]
-        (val e)
-        (let [ret (apply f args)]
-          (swap! mem assoc args ret)
-          ret)))))
 
 (defmacro condp
   "Takes a binary predicate, an expression, and a set of clauses.
@@ -5836,18 +5764,6 @@
   "
   {:added "1.0"})
 
-#_(defn future?
-  "Returns true if x is a future"
-  {:added "1.1"
-   :static true}
-  [x] (instance? java.util.concurrent.Future x))
-
-#_(defn future-done?
-  "Returns true if future f is done"
-  {:added "1.1"
-   :static true}
-  [^java.util.concurrent.Future f] (.isDone f))
-
 
 (defmacro letfn
   "fnspec ==> (fname [params*] exprs) or (fname ([params*] exprs)+)
@@ -5861,31 +5777,6 @@
   `(letfn* ~(vec (interleave (map first fnspecs) 
                              (map #(cons `fn %) fnspecs)))
            ~@body))
-
-#_(defn fnil
-  "Takes a function f, and returns a function that calls f, replacing
-  a nil first argument to f with the supplied value x. Higher arity
-  versions can replace arguments in the second and third
-  positions (y, z). Note that the function f can take any number of
-  arguments, not just the one(s) being nil-patched."
-  {:added "1.2"
-   :static true}
-  ([f x]
-   (fn
-     ([a] (f (if (nil? a) x a)))
-     ([a b] (f (if (nil? a) x a) b))
-     ([a b c] (f (if (nil? a) x a) b c))
-     ([a b c & ds] (apply f (if (nil? a) x a) b c ds))))
-  ([f x y]
-   (fn
-     ([a b] (f (if (nil? a) x a) (if (nil? b) y b)))
-     ([a b c] (f (if (nil? a) x a) (if (nil? b) y b) c))
-     ([a b c & ds] (apply f (if (nil? a) x a) (if (nil? b) y b) c ds))))
-  ([f x y z]
-   (fn
-     ([a b] (f (if (nil? a) x a) (if (nil? b) y b)))
-     ([a b c] (f (if (nil? a) x a) (if (nil? b) y b) (if (nil? c) z c)))
-     ([a b c & ds] (apply f (if (nil? a) x a) (if (nil? b) y b) (if (nil? c) z c) ds)))))
 
 
 ;;;;;;; case ;;;;;;;;;;;;;
