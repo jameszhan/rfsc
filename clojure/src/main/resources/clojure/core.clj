@@ -5812,7 +5812,7 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; helper files ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (alter-meta! (find-ns 'clojure.core) assoc :doc "Fundamental library of the Clojure language")
-(load "core_proxy")
+;(load "core_proxy")
 (load "core_print")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; clojure version number ;;;;;;;;;;;;;;;;;;;;;;
