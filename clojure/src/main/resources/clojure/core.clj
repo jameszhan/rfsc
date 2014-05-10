@@ -5814,14 +5814,15 @@
 (alter-meta! (find-ns 'clojure.core) assoc :doc "Fundamental library of the Clojure language")
 (load "core_proxy")
 (load "core_print")
-(load "genclass")
-(load "core_deftype")
-(load "core/protocols")
+;(load "genclass")
+;(load "core_deftype")
+;(load "core/protocols")
+
 ;(load "gvec")
 ;(load "instant")
 ;(load "uuid")
 
-(defn reduce
+#_(defn reduce
   "f should be a function of 2 arguments. If val is not supplied,
   returns the result of applying f to the first 2 items in coll, then
   applying f to that result and the 3rd item, etc. If coll contains no
@@ -5837,7 +5838,7 @@
   ([f val coll]
      (clojure.core.protocols/coll-reduce coll f val)))
 
-(extend-protocol clojure.core.protocols/IKVReduce
+#_(extend-protocol clojure.core.protocols/IKVReduce
  nil
  (kv-reduce
   [_ f init]
@@ -5870,7 +5871,7 @@
   (.kvreduce vec f init)))
 
 
-(defn into
+#_(defn into
   "Returns a new coll consisting of to-coll with all of the items of
   from-coll conjoined."
   {:added "1.0"
