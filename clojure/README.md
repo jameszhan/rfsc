@@ -1,0 +1,3 @@
+~~~shell
+java clojure.main
+~~~

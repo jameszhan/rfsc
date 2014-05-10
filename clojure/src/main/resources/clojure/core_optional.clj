@@ -2,7 +2,7 @@
 
 
 ;;;;;;;;;;;;;;;;at this point all the support for syntax-quote exists;;;;;;;;;;;;;;;;;;;;;;
-#_(defmacro delay
+(defmacro delay
     "Takes a body of expressions and yields a Delay object that will
     invoke the body only the first time it is forced (with force or deref/@), and
     will cache the result and return it on all subsequent force
@@ -11,20 +11,20 @@
     [& body]
     (list 'new 'clojure.lang.Delay (list* `^{:once true} fn* [] body)))
 
-#_(defn delay?
+(defn delay?
     "returns true if x is a Delay created with delay"
     {:added "1.0"
      :static true}
     [x] (instance? clojure.lang.Delay x))
 
-#_(defn force
+(defn force
     "If x is a Delay, returns the (possibly cached) value of its expression, else returns x"
     {:added "1.0"
-     :static true}
+    :static true}
     [x] (. clojure.lang.Delay (force x)))
 
-#_(defn inc'
-           "Returns a number one greater than num. Supports arbitrary precision.
+(defn inc'
+          "Returns a number one greater than num. Supports arbitrary precision.
            See also: inc"
     {:inline (fn [x] `(. clojure.lang.Numbers (incP ~x)))
      :added "1.0"}
@@ -32,7 +32,7 @@
 
 ;;math stuff
 
-#_(defn +'
+(defn +'
          "Returns the sum of nums. (+) returns 0. Supports arbitrary precision.
          See also: +"
     {:inline (nary-inline 'addP)
@@ -44,7 +44,7 @@
     ([x y & more]
       (reduce1 +' (+' x y) more)))
 
-#_(defn *'
+(defn *'
          "Returns the product of nums. (*) returns 1. Supports arbitrary precision.
          See also: *"
     {:inline (nary-inline 'multiplyP)
@@ -56,7 +56,7 @@
     ([x y & more]
       (reduce1 *' (*' x y) more)))
 
-#_(defn -'
+(defn -'
          "If no ys are supplied, returns the negation of x, else subtracts
          the ys from x and returns the result. Supports arbitrary precision.
          See also: -"
@@ -68,105 +68,105 @@
     ([x y & more]
       (reduce1 -' (-' x y) more)))
 
-#_(defn dec'
+(defn dec'
            "Returns a number one less than num. Supports arbitrary precision.
            See also: dec"
     {:inline (fn [x] `(. clojure.lang.Numbers (decP ~x)))
      :added "1.0"}
     [x] (. clojure.lang.Numbers (decP x)))
 
-#_(defn unchecked-inc-int
+(defn unchecked-inc-int
     "Returns a number one greater than x, an int.
     Note - uses a primitive operator subject to overflow."
     {:inline (fn [x] `(. clojure.lang.Numbers (unchecked_int_inc ~x)))
      :added "1.0"}
     [x] (. clojure.lang.Numbers (unchecked_int_inc x)))
 
-#_(defn unchecked-dec-int
+(defn unchecked-dec-int
     "Returns a number one less than x, an int.
     Note - uses a primitive operator subject to overflow."
     {:inline (fn [x] `(. clojure.lang.Numbers (unchecked_int_dec ~x)))
      :added "1.0"}
     [x] (. clojure.lang.Numbers (unchecked_int_dec x)))
 
-#_(defn unchecked-dec
+(defn unchecked-dec
     "Returns a number one less than x, a long.
     Note - uses a primitive operator subject to overflow."
     {:inline (fn [x] `(. clojure.lang.Numbers (unchecked_dec ~x)))
      :added "1.0"}
     [x] (. clojure.lang.Numbers (unchecked_dec x)))
 
-#_(defn unchecked-negate-int
+(defn unchecked-negate-int
     "Returns the negation of x, an int.
     Note - uses a primitive operator subject to overflow."
     {:inline (fn [x] `(. clojure.lang.Numbers (unchecked_int_negate ~x)))
      :added "1.0"}
     [x] (. clojure.lang.Numbers (unchecked_int_negate x)))
 
-#_(defn unchecked-negate
+(defn unchecked-negate
     "Returns the negation of x, a long.
     Note - uses a primitive operator subject to overflow."
     {:inline (fn [x] `(. clojure.lang.Numbers (unchecked_minus ~x)))
      :added "1.0"}
     [x] (. clojure.lang.Numbers (unchecked_minus x)))
 
-#_(defn unchecked-add-int
+(defn unchecked-add-int
     "Returns the sum of x and y, both int.
     Note - uses a primitive operator subject to overflow."
     {:inline (fn [x y] `(. clojure.lang.Numbers (unchecked_int_add ~x ~y)))
      :added "1.0"}
     [x y] (. clojure.lang.Numbers (unchecked_int_add x y)))
 
-#_(defn unchecked-add
+(defn unchecked-add
     "Returns the sum of x and y, both long.
     Note - uses a primitive operator subject to overflow."
     {:inline (fn [x y] `(. clojure.lang.Numbers (unchecked_add ~x ~y)))
      :added "1.0"}
     [x y] (. clojure.lang.Numbers (unchecked_add x y)))
 
-#_(defn unchecked-subtract-int
+(defn unchecked-subtract-int
     "Returns the difference of x and y, both int.
     Note - uses a primitive operator subject to overflow."
     {:inline (fn [x y] `(. clojure.lang.Numbers (unchecked_int_subtract ~x ~y)))
      :added "1.0"}
     [x y] (. clojure.lang.Numbers (unchecked_int_subtract x y)))
 
-#_(defn unchecked-subtract
+(defn unchecked-subtract
     "Returns the difference of x and y, both long.
     Note - uses a primitive operator subject to overflow."
     {:inline (fn [x y] `(. clojure.lang.Numbers (unchecked_minus ~x ~y)))
      :added "1.0"}
     [x y] (. clojure.lang.Numbers (unchecked_minus x y)))
 
-#_(defn unchecked-multiply-int
+(defn unchecked-multiply-int
     "Returns the product of x and y, both int.
     Note - uses a primitive operator subject to overflow."
     {:inline (fn [x y] `(. clojure.lang.Numbers (unchecked_int_multiply ~x ~y)))
      :added "1.0"}
     [x y] (. clojure.lang.Numbers (unchecked_int_multiply x y)))
 
-#_(defn unchecked-multiply
+(defn unchecked-multiply
     "Returns the product of x and y, both long.
     Note - uses a primitive operator subject to overflow."
     {:inline (fn [x y] `(. clojure.lang.Numbers (unchecked_multiply ~x ~y)))
      :added "1.0"}
     [x y] (. clojure.lang.Numbers (unchecked_multiply x y)))
 
-#_(defn unchecked-divide-int
+(defn unchecked-divide-int
     "Returns the division of x by y, both int.
     Note - uses a primitive operator subject to truncation."
     {:inline (fn [x y] `(. clojure.lang.Numbers (unchecked_int_divide ~x ~y)))
      :added "1.0"}
     [x y] (. clojure.lang.Numbers (unchecked_int_divide x y)))
 
-#_(defn unchecked-remainder-int
+(defn unchecked-remainder-int
     "Returns the remainder of division of x by y, both int.
     Note - uses a primitive operator subject to truncation."
     {:inline (fn [x y] `(. clojure.lang.Numbers (unchecked_int_remainder ~x ~y)))
      :added "1.0"}
     [x y] (. clojure.lang.Numbers (unchecked_int_remainder x y)))
 
-#_(defn quot
+(defn quot
     "quot[ient] of dividing numerator by denominator."
     {:added "1.0"
      :static true
@@ -174,7 +174,7 @@
     [num div]
     (. clojure.lang.Numbers (quotient num div)))
 
-#_(defn rem
+(defn rem
     "remainder of dividing numerator by denominator."
     {:added "1.0"
      :static true
@@ -182,7 +182,7 @@
     [num div]
     (. clojure.lang.Numbers (remainder num div)))
 
-#_(defn rationalize
+(defn rationalize
     "returns the rational value of num"
     {:added "1.0"
      :static true}
@@ -191,13 +191,13 @@
 
 ;;Bit ops
 
-#_(defn bit-not
+(defn bit-not
     "Bitwise complement"
     {:inline (fn [x] `(. clojure.lang.Numbers (not ~x)))
      :added "1.0"}
     [x] (. clojure.lang.Numbers not x))
 
-#_(defn bit-xor
+(defn bit-xor
     "Bitwise exclusive or"
     {:inline (nary-inline 'xor)
      :inline-arities >1?
@@ -206,7 +206,7 @@
     ([x y & more]
       (reduce1 bit-xor (bit-xor x y) more)))
 
-#_(defn bit-and-not
+(defn bit-and-not
     "Bitwise and with complement"
     {:inline (nary-inline 'andNot)
      :inline-arities >1?
@@ -217,50 +217,50 @@
       (reduce1 bit-and-not (bit-and-not x y) more)))
 
 
-#_(defn bit-clear
+(defn bit-clear
     "Clear bit at index n"
     {:added "1.0"
      :static true}
     [x n] (. clojure.lang.Numbers clearBit x n))
 
-#_(defn bit-set
+(defn bit-set
     "Set bit at index n"
     {:added "1.0"
      :static true}
     [x n] (. clojure.lang.Numbers setBit x n))
 
-#_(defn bit-flip
+(defn bit-flip
     "Flip bit at index n"
     {:added "1.0"
      :static true}
     [x n] (. clojure.lang.Numbers flipBit x n))
 
-#_(defn bit-test
+(defn bit-test
     "Test bit at index n"
     {:added "1.0"
      :static true}
     [x n] (. clojure.lang.Numbers testBit x n))
 
 
-#_(defn bit-shift-left
+(defn bit-shift-left
     "Bitwise shift left"
     {:inline (fn [x n] `(. clojure.lang.Numbers (shiftLeft ~x ~n)))
      :added "1.0"}
     [x n] (. clojure.lang.Numbers shiftLeft x n))
 
-#_(defn bit-shift-right
+(defn bit-shift-right
     "Bitwise shift right"
     {:inline (fn [x n] `(. clojure.lang.Numbers (shiftRight ~x ~n)))
      :added "1.0"}
     [x n] (. clojure.lang.Numbers shiftRight x n))
 
-#_(defn unsigned-bit-shift-right
+(defn unsigned-bit-shift-right
     "Bitwise shift right, without sign-extension."
     {:inline (fn [x n] `(. clojure.lang.Numbers (unsignedShiftRight ~x ~n)))
      :added "1.6"}
     [x n] (. clojure.lang.Numbers unsignedShiftRight x n))
 
-#_(defn rseq
+(defn rseq
     "Returns, in constant time, a seq of the items in rev (which
     can be a vector or sorted-map), in reverse order. If rev is empty returns nil"
     {:added "1.0"
@@ -268,7 +268,7 @@
     [^clojure.lang.Reversible rev]
     (. rev (rseq)))
 
-#_(defmacro locking
+(defmacro locking
     "Executes exprs in an implicit do, while holding the monitor of x.
     Will release the monitor of x in all circumstances."
     {:added "1.0"}
@@ -280,7 +280,7 @@
          (finally
            (monitor-exit lockee#)))))
 
-#_(defmacro ->>
+(defmacro ->>
     "Threads the expr through the forms. Inserts x as the
     last item in the first form, making a list of it if it is not a
     list already. If there are more forms, inserts the first form as the
@@ -331,7 +331,7 @@
    :static true}
   [^clojure.lang.MultiFn multifn] (.getPreferTable multifn))
 
-#_(defmacro if-some
+(defmacro if-some
     "bindings => binding-form test
 
      If test is not nil, evaluates then with binding-form bound to the
@@ -381,7 +381,7 @@
   [sym] (. clojure.lang.Var (find sym)))
 
 
-#_(defn binding-conveyor-fn
+(defn binding-conveyor-fn
     {:private true
      :added "1.3"}
     [f]
@@ -405,7 +405,7 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Refs ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-#_(defn agent
+(defn agent
     "Creates and returns an agent with an initial value of state and
     zero or more options (in any order):
 
@@ -440,19 +440,19 @@
                            (if (:error-handler opts) :continue :fail)))
         a)))
 
-#_(defn set-agent-send-executor!
+(defn set-agent-send-executor!
     "Sets the ExecutorService to be used by send"
     {:added "1.5"}
     [executor]
     (set! clojure.lang.Agent/pooledExecutor executor))
 
-#_(defn set-agent-send-off-executor!
+(defn set-agent-send-off-executor!
     "Sets the ExecutorService to be used by send-off"
     {:added "1.5"}
     [executor]
     (set! clojure.lang.Agent/soloExecutor executor))
 
-#_(defn send-via
+(defn send-via
     "Dispatch an action to an agent. Returns the agent immediately.
     Subsequently, in a thread supplied by executor, the state of the agent
     will be set to the value of:
@@ -462,7 +462,7 @@
     [executor ^clojure.lang.Agent a f & args]
     (.dispatch a (binding [*agent* a] (binding-conveyor-fn f)) args executor))
 
-#_(defn send
+(defn send
     "Dispatch an action to an agent. Returns the agent immediately.
     Subsequently, in a thread from a thread pool, the state of the agent
     will be set to the value of:
@@ -473,7 +473,7 @@
     [^clojure.lang.Agent a f & args]
     (apply send-via clojure.lang.Agent/pooledExecutor a f args))
 
-#_(defn send-off
+(defn send-off
     "Dispatch a potentially blocking action to an agent. Returns the
     agent immediately. Subsequently, in a separate thread, the state of
     the agent will be set to the value of:
@@ -484,7 +484,7 @@
     [^clojure.lang.Agent a f & args]
     (apply send-via clojure.lang.Agent/soloExecutor a f args))
 
-#_(defn release-pending-sends
+(defn release-pending-sends
     "Normally, actions sent directly or indirectly during another action
     are held until the action completes (changes the agent's
     state). This function can be used to dispatch any pending sent
@@ -495,7 +495,7 @@
      :static true}
     [] (clojure.lang.Agent/releasePendingSends))
 
-#_(defn add-watch
+(defn add-watch
     "Adds a watch function to an agent/atom/var/ref reference. The watch
     fn must be a fn of 4 args: a key, the reference, its old-state, its
     new-state. Whenever the reference's state might have been changed,
@@ -513,7 +513,7 @@
      :static true}
     [^clojure.lang.IRef reference key fn] (.addWatch reference key fn))
 
-#_(defn remove-watch
+(defn remove-watch
     "Removes a watch (set by add-watch) from a reference"
     {:added "1.0"
      :static true}
@@ -522,7 +522,7 @@
 
 
 
-#_(defn restart-agent
+(defn restart-agent
     "When an agent is failed, changes the agent state to new-state and
     then un-fails the agent so that sends are allowed again.  If
     a :clear-actions true option is given, any actions queued on the
@@ -539,7 +539,7 @@
     (let [opts (apply hash-map options)]
       (.restart a new-state (if (:clear-actions opts) true false))))
 
-#_(defn set-error-handler!
+(defn set-error-handler!
     "Sets the error-handler of agent a to handler-fn.  If an action
     being run by the agent throws an exception or doesn't pass the
     validator fn, handler-fn will be called with two arguments: the
@@ -549,7 +549,7 @@
     [^clojure.lang.Agent a, handler-fn]
     (.setErrorHandler a handler-fn))
 
-#_(defn error-handler
+(defn error-handler
     "Returns the error-handler of agent a, or nil if there is none.
     See set-error-handler!"
     {:added "1.2"
@@ -557,7 +557,7 @@
     [^clojure.lang.Agent a]
     (.getErrorHandler a))
 
-#_(defn set-error-mode!
+(defn set-error-mode!
     "Sets the error-mode of agent a to mode-keyword, which must be
     either :fail or :continue.  If an action being run by the agent
     throws an exception or doesn't pass the validator fn, an
@@ -574,14 +574,14 @@
     [^clojure.lang.Agent a, mode-keyword]
     (.setErrorMode a mode-keyword))
 
-#_(defn error-mode
+(defn error-mode
     "Returns the error-mode of agent a.  See set-error-mode!"
     {:added "1.2"
      :static true}
     [^clojure.lang.Agent a]
     (.getErrorMode a))
 
-#_(defn agent-errors
+(defn agent-errors
     "DEPRECATED: Use 'agent-error' instead.
     Returns a sequence of the exceptions thrown during asynchronous
     actions of the agent."
@@ -591,7 +591,7 @@
     (when-let [e (agent-error a)]
       (list e)))
 
-#_(defn clear-agent-errors
+(defn clear-agent-errors
     "DEPRECATED: Use 'restart-agent' instead.
     Clears any exceptions thrown during asynchronous actions of the
     agent, allowing subsequent actions to occur."
@@ -599,7 +599,7 @@
      :deprecated "1.2"}
     [^clojure.lang.Agent a] (restart-agent a (.deref a)))
 
-#_(defn shutdown-agents
+(defn shutdown-agents
     "Initiates a shutdown of the thread pools that back the agent
     system. Running actions will complete, but no new actions will be
     accepted"
@@ -608,7 +608,7 @@
     [] (. clojure.lang.Agent shutdown))
 
 
-#_(defn atom
+(defn atom
     "Creates and returns an Atom with an initial value of x and zero or
     more options (in any order):
 
@@ -626,7 +626,7 @@
     ([x] (new clojure.lang.Atom x))
     ([x & options] (setup-reference (atom x) options)))
 
-#_(defn swap!
+(defn swap!
     "Atomically swaps the value of atom to be:
     (apply f current-value-of-atom args). Note that f may be called
     multiple times, and thus should be free of side effects.  Returns
@@ -638,7 +638,7 @@
     ([^clojure.lang.Atom atom f x y] (.swap atom f x y))
     ([^clojure.lang.Atom atom f x y & args] (.swap atom f x y args)))
 
-#_(defn compare-and-set!
+(defn compare-and-set!
     "Atomically sets the value of atom to newval if and only if the
     current value of the atom is identical to oldval. Returns true if
     set happened, else false"
@@ -646,14 +646,14 @@
      :static true}
     [^clojure.lang.Atom atom oldval newval] (.compareAndSet atom oldval newval))
 
-#_(defn reset!
+(defn reset!
     "Sets the value of atom to newval without regard for the
     current value. Returns newval."
     {:added "1.0"
      :static true}
     [^clojure.lang.Atom atom newval] (.reset atom newval))
 
-#_(defn set-validator!
+(defn set-validator!
     "Sets the validator-fn for a var/ref/agent/atom. validator-fn must be nil or a
     side-effect-free fn of one argument, which will be passed the intended
     new state on any state change. If the new state is unacceptable, the
@@ -664,19 +664,19 @@
      :static true}
     [^clojure.lang.IRef iref validator-fn] (. iref (setValidator validator-fn)))
 
-#_(defn get-validator
+(defn get-validator
     "Gets the validator-fn for a var/ref/agent/atom."
     {:added "1.0"
      :static true}
     [^clojure.lang.IRef iref] (. iref (getValidator)))
 
-#_(defn reset-meta!
+(defn reset-meta!
     "Atomically resets the metadata for a namespace/var/ref/agent/atom"
     {:added "1.0"
      :static true}
     [^clojure.lang.IReference iref metadata-map] (.resetMeta iref metadata-map))
 
-#_(defn alter
+(defn alter
     "Must be called in a transaction. Sets the in-transaction-value of
     ref to:
 
@@ -688,7 +688,7 @@
     [^clojure.lang.Ref ref fun & args]
     (. ref (alter fun args)))
 
-#_(defn ref-set
+(defn ref-set
     "Must be called in a transaction. Sets the value of ref.
     Returns val."
     {:added "1.0"
@@ -696,14 +696,14 @@
     [^clojure.lang.Ref ref val]
     (. ref (set val)))
 
-#_(defn ref-history-count
+(defn ref-history-count
     "Returns the history count of a ref"
     {:added "1.1"
      :static true}
     [^clojure.lang.Ref ref]
     (.getHistoryCount ref))
 
-#_(defn ref-min-history
+(defn ref-min-history
     "Gets the min-history of a ref, or sets it and returns the ref"
     {:added "1.1"
      :static true}
@@ -712,7 +712,7 @@
     ([^clojure.lang.Ref ref n]
       (.setMinHistory ref n)))
 
-#_(defn ref-max-history
+(defn ref-max-history
     "Gets the max-history of a ref, or sets it and returns the ref"
     {:added "1.1"
      :static true}
@@ -721,7 +721,7 @@
     ([^clojure.lang.Ref ref n]
       (.setMaxHistory ref n)))
 
-#_(defn ensure
+(defn ensure
     "Must be called in a transaction. Protects the ref from modification
     by other transactions.  Returns the in-transaction-value of
     ref. Allows for more concurrency than (ref-set ref @ref)"
@@ -731,7 +731,7 @@
     (. ref (touch))
     (. ref (deref)))
 
-#_(defmacro io!
+(defmacro io!
     "If an io! block occurs in a transaction, throws an
     IllegalStateException, else runs body in an implicit do. If the
     first expression in body is a literal string, will use that as the
@@ -746,7 +746,7 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; fn stuff ;;;;;;;;;;;;;;;;
 
-#_(defn juxt
+(defn juxt
     "Takes a set of functions and returns a fn that is the juxtaposition
     of those fns.  The returned fn takes a variable number of args, and
     returns a vector containing the result of applying each fn to the
@@ -785,7 +785,7 @@
           ([x y z & args] (reduce1 #(conj %1 (apply %2 x y z args)) [] fs))))))
 
 ;;;;;;;;;;;;;;;;;;; sequence fns  ;;;;;;;;;;;;;;;;;;;;;;;
-#_(defn sequence
+(defn sequence
     "Coerces coll to a (possibly empty) sequence, if it is not already
     one. Will not force a lazy seq. (sequence nil) yields ()"
     {:added "1.0"
@@ -794,7 +794,7 @@
     (if (seq? coll) coll
       (or (seq coll) ())))
 
-#_(def
+(def
     ^{:tag Boolean
       :doc "Returns false if (pred x) is logical true for every x in
   coll, else true."
@@ -802,14 +802,14 @@
       :added "1.0"}
     not-every? (comp not every?))
 
-#_(defn drop-last
+(defn drop-last
     "Return a lazy sequence of all but the last n (default 1) items in coll"
     {:added "1.0"
      :static true}
     ([s] (drop-last 1 s))
     ([n s] (map (fn [x _] x) s (drop n s))))
 
-#_(defn take-last
+(defn take-last
     "Returns a seq of the last n items in coll.  Depending on the type
     of coll may be no better than linear time.  For vectors, see also subvec."
     {:added "1.1"
@@ -820,7 +820,7 @@
         (recur (next s) (next lead))
         s)))
 
-#_(defn cycle
+(defn cycle
     "Returns a lazy (infinite!) sequence of repetitions of the items in coll."
     {:added "1.0"
      :static true}
@@ -828,14 +828,14 @@
              (when-let [s (seq coll)]
                (concat s (cycle s)))))
 
-#_(defn split-at
+(defn split-at
     "Returns a vector of [(take n coll) (drop n coll)]"
     {:added "1.0"
      :static true}
     [n coll]
     [(take n coll) (drop n coll)])
 
-#_(defn split-with
+(defn split-with
     "Returns a vector of [(take-while pred coll) (drop-while pred coll)]"
     {:added "1.0"
      :static true}
@@ -878,7 +878,7 @@
                 (when (comp i end)
                   (range i end step)))))))))
 
-#_(defn merge-with
+(defn merge-with
     "Returns a map that consists of the rest of the maps conj-ed onto
     the first.  If a key occurs in more than one map, the mapping(s)
     from the latter (left-to-right) will be combined with the mapping in
@@ -896,7 +896,7 @@
                      (reduce1 merge-entry (or m1 {}) (seq m2)))]
         (reduce1 merge2 maps))))
 
-#_(defn zipmap
+(defn zipmap
     "Returns a map with the keys mapped to the corresponding vals."
     {:added "1.0"
      :static true}
@@ -910,7 +910,7 @@
           (next vs))
         map)))
 
-#_(defn line-seq
+(defn line-seq
     "Returns the lines of text from rdr as a lazy sequence of strings.
     rdr must implement java.io.BufferedReader."
     {:added "1.0"
@@ -919,7 +919,7 @@
     (when-let [line (.readLine rdr)]
       (cons line (lazy-seq (line-seq rdr)))))
 
-#_(defn comparator
+(defn comparator
     "Returns an implementation of java.util.Comparator based upon pred."
     {:added "1.0"
      :static true}
@@ -927,7 +927,7 @@
     (fn [x y]
       (cond (pred x y) -1 (pred y x) 1 :else 0)))
 
-#_(defn await
+(defn await
     "Blocks the current thread (indefinitely!) until all actions
     dispatched thus far, from this thread or agent, to the agent(s) have
     occurred.  Will block on failed agents.  Will never return if
@@ -944,12 +944,12 @@
           (send agent count-down))
         (. latch (await)))))
 
-#_(defn ^:static await1 [^clojure.lang.Agent a]
+(defn ^:static await1 [^clojure.lang.Agent a]
     (when (pos? (.getQueueCount a))
       (await a))
     a)
 
-#_(defn await-for
+(defn await-for
     "Blocks the current thread until all actions dispatched thus
     far (from this thread or agent) to the agents have occurred, or the
     timeout (in milliseconds) has elapsed. Returns logical false if
@@ -1186,7 +1186,7 @@
         (number? x) (BigDecimal/valueOf (long x))
         :else (BigDecimal. x)))
 
-#_(defn read-line
+(defn read-line
     "Reads the next line from stream that is the current value of *in* ."
     {:added "1.0"
      :static true}
@@ -1195,7 +1195,7 @@
       (.readLine ^clojure.lang.LineNumberingPushbackReader *in*)
       (.readLine ^java.io.BufferedReader *in*)))
 
-#_(defn read-string
+(defn read-string
     "Reads one object from the string s.
 
     Note that read-string can execute code (controlled by *read-eval*),
@@ -1206,7 +1206,7 @@
      :static true}
     [s] (clojure.lang.RT/readString s))
 
-#_(defmacro memfn
+(defmacro memfn
     "Expands into code that creates a fn that expects to be passed an
     object and any args and calls the named instance method on the
     object passing the args. Use when you want to treat a Java method as
@@ -1219,7 +1219,7 @@
       `(fn [~t ~@args]
          (. ~t (~name ~@args)))))
 
-#_(defmacro time
+(defmacro time
     "Evaluates expr and prints the time it took.  Returns the value of
    expr."
     {:added "1.0"}
@@ -1230,14 +1230,14 @@
        ret#))
 
 
-#_(defn aclone
+(defn aclone
     "Returns a clone of the Java array. Works on arrays of known
     types."
     {:inline (fn [a] `(. clojure.lang.RT (aclone ~a)))
      :added "1.0"}
     [array] (. clojure.lang.RT (aclone array)))
 
-#_(defn aset
+(defn aset
     "Sets the value at the index/indices. Works on Java arrays of
     reference types. Returns val."
     {:inline (fn [a i v] `(. clojure.lang.RT (aset ~a (int ~i) ~v)))
@@ -1249,42 +1249,42 @@
     ([array idx idx2 & idxv]
       (apply aset (aget array idx) idx2 idxv)))
 
-#_(def-aset
+(def-aset
     ^{:doc "Sets the value at the index/indices. Works on arrays of long. Returns val."
       :added "1.0"}
     aset-long setLong long)
 
-#_(def-aset
+(def-aset
     ^{:doc "Sets the value at the index/indices. Works on arrays of boolean. Returns val."
       :added "1.0"}
     aset-boolean setBoolean boolean)
 
-#_(def-aset
+(def-aset
     ^{:doc "Sets the value at the index/indices. Works on arrays of float. Returns val."
       :added "1.0"}
     aset-float setFloat float)
 
-#_(def-aset
+(def-aset
     ^{:doc "Sets the value at the index/indices. Works on arrays of double. Returns val."
       :added "1.0"}
     aset-double setDouble double)
 
-#_(def-aset
+(def-aset
     ^{:doc "Sets the value at the index/indices. Works on arrays of short. Returns val."
       :added "1.0"}
     aset-short setShort short)
 
-#_(def-aset
+(def-aset
     ^{:doc "Sets the value at the index/indices. Works on arrays of byte. Returns val."
       :added "1.0"}
     aset-byte setByte byte)
 
-#_(def-aset
+(def-aset
     ^{:doc "Sets the value at the index/indices. Works on arrays of char. Returns val."
       :added "1.0"}
     aset-char setChar char)
 
-#_(defn to-array-2d
+(defn to-array-2d
     "Returns a (potentially-ragged) 2-dimensional array of Objects
     containing the contents of coll, which can be any Collection of any
     Collection."
@@ -1299,21 +1299,21 @@
           (recur (inc i) (next xs))))
       ret))
 
-#_(defn create-struct
+(defn create-struct
     "Returns a structure basis object."
     {:added "1.0"
      :static true}
     [& keys]
     (. clojure.lang.PersistentStructMap (createSlotMap keys)))
 
-#_(defmacro defstruct
+(defmacro defstruct
     "Same as (def name (create-struct keys...))"
     {:added "1.0"
      :static true}
     [name & keys]
     `(def ~name (create-struct ~@keys)))
 
-#_(defn struct-map
+(defn struct-map
     "Returns a new structmap instance with the keys of the
     structure-basis. keyvals may contain all, some or none of the basis
     keys - where values are not supplied they will default to nil.
@@ -1323,7 +1323,7 @@
     [s & inits]
     (. clojure.lang.PersistentStructMap (create s inits)))
 
-#_(defn struct
+(defn struct
     "Returns a new structmap instance with the keys of the
     structure-basis. vals must be supplied for basis keys in order -
     where values are not supplied they will default to nil."
@@ -1332,7 +1332,7 @@
     [s & vals]
     (. clojure.lang.PersistentStructMap (construct s vals)))
 
-#_(defn accessor
+(defn accessor
     "Returns a fn that, given an instance of a structmap with the basis,
     returns the value at the key.  The key must be in the basis. The
     returned function should be (slightly) more efficient than using
@@ -1343,7 +1343,7 @@
     [s key]
     (. clojure.lang.PersistentStructMap (getAccessor s key)))
 
-#_(defn load-string
+(defn load-string
     "Sequentially read and evaluate the set of forms contained in the
     string"
     {:added "1.0"
@@ -1353,7 +1353,7 @@
                 (clojure.lang.LineNumberingPushbackReader.))]
       (load-reader rdr)))
 
-#_(defn ns-refers
+(defn ns-refers
     "Returns a map of the refer mappings for the namespace."
     {:added "1.0"
      :static true}
@@ -1363,34 +1363,34 @@
                                                   (not= ns (.ns v))))
         (ns-map ns))))
 
-#_(defn ns-aliases
+(defn ns-aliases
     "Returns a map of the aliases for the namespace."
     {:added "1.0"
      :static true}
     [ns]
     (.getAliases (the-ns ns)))
 
-#_(defn ns-unalias
+(defn ns-unalias
     "Removes the alias for the symbol from the namespace."
     {:added "1.0"
      :static true}
     [ns sym]
     (.removeAlias (the-ns ns) sym))
 
-#_(defn var-get
+(defn var-get
     "Gets the value in the var object"
     {:added "1.0"
      :static true}
     [^clojure.lang.Var x] (. x (get)))
 
-#_(defn var-set
+(defn var-set
     "Sets the value in the var object to val. The var must be
    thread-locally bound."
     {:added "1.0"
      :static true}
     [^clojure.lang.Var x val] (. x (set val)))
 
-#_(defmacro with-local-vars
+(defmacro with-local-vars
     "varbinding=> symbol init-expr
 
     Executes the exprs in a context in which the symbols are bound to
@@ -1409,7 +1409,7 @@
          ~@body
          (finally (. clojure.lang.Var (popThreadBindings))))))
 
-#_(defn array-map
+(defn array-map
     "Constructs an array-map. If any keys are equal, they are handled as
     if by repeated uses of assoc."
     {:added "1.0"
@@ -1630,10 +1630,6 @@
   (clojure.lang.RT/addURL url))
 
 
-
-
-
-
 (defn mix-collection-hash
   "Mix final collection hash for ordered or unordered collections.
    hash-basis is the combined collection hash, count is the number
@@ -1692,7 +1688,7 @@
 
 (import '(java.util.concurrent BlockingQueue LinkedBlockingQueue))
 
-#_(defn seque
+(defn seque
     "Creates a queued seq on another (presumably lazy) seq s. The queued
     seq will produce a concrete seq in the background, and can get up to
     n items ahead of the consumer. n-or-q can be an integer n buffer
@@ -2022,26 +2018,26 @@
 
 
 
-#_(defn empty?
+(defn empty?
     "Returns true if coll has no items - same as (not (seq coll)).
     Please use the idiom (seq x) rather than (not (empty? x))"
     {:added "1.0"
      :static true}
     [coll] (not (seq coll)))
 
-#_(defn coll?
+(defn coll?
     "Returns true if x implements IPersistentCollection"
     {:added "1.0"
      :static true}
     [x] (instance? clojure.lang.IPersistentCollection x))
 
-#_(defn list?
+(defn list?
     "Returns true if x implements IPersistentList"
     {:added "1.0"
      :static true}
     [x] (instance? clojure.lang.IPersistentList x))
 
-#_(defn set?
+(defn set?
     "Returns true if x implements IPersistentSet"
     {:added "1.0"
      :static true}
@@ -2054,38 +2050,38 @@
      :static true}
     [x] (instance? clojure.lang.IFn x))
 
-#_(defn fn?
+(defn fn?
     "Returns true if x implements Fn, i.e. is an object created via fn."
     {:added "1.0"
      :static true}
     [x] (instance? clojure.lang.Fn x))
 
 
-#_(defn associative?
+(defn associative?
     "Returns true if coll implements Associative"
     {:added "1.0"
      :static true}
     [coll] (instance? clojure.lang.Associative coll))
 
-#_(defn sequential?
+(defn sequential?
     "Returns true if coll implements Sequential"
     {:added "1.0"
      :static true}
     [coll] (instance? clojure.lang.Sequential coll))
 
-#_(defn sorted?
+(defn sorted?
     "Returns true if coll implements Sorted"
     {:added "1.0"
      :static true}
     [coll] (instance? clojure.lang.Sorted coll))
 
-#_(defn counted?
+(defn counted?
     "Returns true if coll implements count in constant time"
     {:added "1.0"
      :static true}
     [coll] (instance? clojure.lang.Counted coll))
 
-#_(defn reversible?
+(defn reversible?
     "Returns true if coll implements Reversible"
     {:added "1.0"
      :static true}
