@@ -1882,7 +1882,7 @@
    :static true}
   [sym] (. clojure.lang.Var (find sym)))
 
-(defn binding-conveyor-fn
+#_(defn binding-conveyor-fn
   {:private true
    :added "1.3"}
   [f]
@@ -1914,7 +1914,7 @@
       (.setValidator r (:validator opts)))
     r))
 
-(defn agent
+#_(defn agent
   "Creates and returns an agent with an initial value of state and
   zero or more options (in any order):
 
@@ -1949,19 +1949,19 @@
                             (if (:error-handler opts) :continue :fail)))
        a)))
 
-(defn set-agent-send-executor!
+#_(defn set-agent-send-executor!
   "Sets the ExecutorService to be used by send"
   {:added "1.5"}
   [executor]
   (set! clojure.lang.Agent/pooledExecutor executor))
 
-(defn set-agent-send-off-executor!
+#_(defn set-agent-send-off-executor!
   "Sets the ExecutorService to be used by send-off"
   {:added "1.5"}
   [executor]
   (set! clojure.lang.Agent/soloExecutor executor))
 
-(defn send-via
+#_(defn send-via
   "Dispatch an action to an agent. Returns the agent immediately.
   Subsequently, in a thread supplied by executor, the state of the agent
   will be set to the value of:
@@ -1971,7 +1971,7 @@
   [executor ^clojure.lang.Agent a f & args]
   (.dispatch a (binding [*agent* a] (binding-conveyor-fn f)) args executor))
 
-(defn send
+#_(defn send
   "Dispatch an action to an agent. Returns the agent immediately.
   Subsequently, in a thread from a thread pool, the state of the agent
   will be set to the value of:
@@ -1982,7 +1982,7 @@
   [^clojure.lang.Agent a f & args]
   (apply send-via clojure.lang.Agent/pooledExecutor a f args))
 
-(defn send-off
+#_(defn send-off
   "Dispatch a potentially blocking action to an agent. Returns the
   agent immediately. Subsequently, in a separate thread, the state of
   the agent will be set to the value of:
@@ -1993,7 +1993,7 @@
   [^clojure.lang.Agent a f & args]
   (apply send-via clojure.lang.Agent/soloExecutor a f args))
 
-(defn release-pending-sends
+#_(defn release-pending-sends
   "Normally, actions sent directly or indirectly during another action
   are held until the action completes (changes the agent's
   state). This function can be used to dispatch any pending sent
@@ -2004,7 +2004,7 @@
    :static true}
   [] (clojure.lang.Agent/releasePendingSends))
 
-(defn add-watch
+#_(defn add-watch
   "Adds a watch function to an agent/atom/var/ref reference. The watch
   fn must be a fn of 4 args: a key, the reference, its old-state, its
   new-state. Whenever the reference's state might have been changed,
@@ -2022,14 +2022,14 @@
    :static true}
   [^clojure.lang.IRef reference key fn] (.addWatch reference key fn))
 
-(defn remove-watch
+#_(defn remove-watch
   "Removes a watch (set by add-watch) from a reference"
   {:added "1.0"
    :static true}
   [^clojure.lang.IRef reference key]
   (.removeWatch reference key))
 
-(defn agent-error
+#(defn agent-error
   "Returns the exception thrown during an asynchronous action of the
   agent if the agent is failed.  Returns nil if the agent is not
   failed."
@@ -2037,7 +2037,7 @@
    :static true}
   [^clojure.lang.Agent a] (.getError a))
 
-(defn restart-agent
+#_(defn restart-agent
   "When an agent is failed, changes the agent state to new-state and
   then un-fails the agent so that sends are allowed again.  If
   a :clear-actions true option is given, any actions queued on the
@@ -2054,7 +2054,7 @@
   (let [opts (apply hash-map options)]
     (.restart a new-state (if (:clear-actions opts) true false))))
 
-(defn set-error-handler!
+#_(defn set-error-handler!
   "Sets the error-handler of agent a to handler-fn.  If an action
   being run by the agent throws an exception or doesn't pass the
   validator fn, handler-fn will be called with two arguments: the
@@ -2064,7 +2064,7 @@
   [^clojure.lang.Agent a, handler-fn]
   (.setErrorHandler a handler-fn))
 
-(defn error-handler
+#_(defn error-handler
   "Returns the error-handler of agent a, or nil if there is none.
   See set-error-handler!"
   {:added "1.2"
@@ -2072,7 +2072,7 @@
   [^clojure.lang.Agent a]
   (.getErrorHandler a))
 
-(defn set-error-mode!
+#_(defn set-error-mode!
   "Sets the error-mode of agent a to mode-keyword, which must be
   either :fail or :continue.  If an action being run by the agent
   throws an exception or doesn't pass the validator fn, an
@@ -2089,14 +2089,14 @@
   [^clojure.lang.Agent a, mode-keyword]
   (.setErrorMode a mode-keyword))
 
-(defn error-mode
+#_(defn error-mode
   "Returns the error-mode of agent a.  See set-error-mode!"
   {:added "1.2"
    :static true}
   [^clojure.lang.Agent a]
   (.getErrorMode a))
 
-(defn agent-errors
+#_(defn agent-errors
   "DEPRECATED: Use 'agent-error' instead.
   Returns a sequence of the exceptions thrown during asynchronous
   actions of the agent."
@@ -2106,7 +2106,7 @@
   (when-let [e (agent-error a)]
     (list e)))
 
-(defn clear-agent-errors
+#_(defn clear-agent-errors
   "DEPRECATED: Use 'restart-agent' instead.
   Clears any exceptions thrown during asynchronous actions of the
   agent, allowing subsequent actions to occur."
@@ -2114,7 +2114,7 @@
    :deprecated "1.2"}
   [^clojure.lang.Agent a] (restart-agent a (.deref a)))
 
-(defn shutdown-agents
+#_(defn shutdown-agents
   "Initiates a shutdown of the thread pools that back the agent
   system. Running actions will complete, but no new actions will be
   accepted"
@@ -2967,7 +2967,7 @@
                                    ~@(when needrec [recform]))))))])))))]
     (nth (step nil (seq seq-exprs)) 1)))
 
-(defn await
+#_(defn await
   "Blocks the current thread (indefinitely!) until all actions
   dispatched thus far, from this thread or agent, to the agent(s) have
   occurred.  Will block on failed agents.  Will never return if
@@ -2984,12 +2984,12 @@
         (send agent count-down))
       (. latch (await)))))
 
-(defn ^:static await1 [^clojure.lang.Agent a]
+#_(defn ^:static await1 [^clojure.lang.Agent a]
   (when (pos? (.getQueueCount a))
     (await a))
     a)
 
-(defn await-for
+#_(defn await-for
   "Blocks the current thread until all actions dispatched thus
   far (from this thread or agent) to the agents have occurred, or the
   timeout (in milliseconds) has elapsed. Returns logical false if
@@ -5893,7 +5893,7 @@
   (-> x (bit-shift-right shift) (bit-and mask)))
 
 (def ^:private max-mask-bits 13)
-(def ^:private max-switch-table-size (bit-shift-left 1 max-mask-bits))
+#_(def ^:private max-switch-table-size (bit-shift-left 1 max-mask-bits))
 
 (defn- maybe-min-hash
   "takes a collection of hashes and returns [shift mask] or nil if none found"
@@ -5905,7 +5905,7 @@
                   shift (range 0 31)]
               [shift mask]))))
 
-(defn- case-map
+#_(defn- case-map
   "Transforms a sequence of test constants and a corresponding sequence of then
   expressions into a sorted map to be consumed by case*. The form of the map
   entries are {(case-f test) [(test-f test) then]}."
@@ -5916,13 +5916,13 @@
               (map test-f tests)
               thens))))
 
-(defn- fits-table?
+#_(defn- fits-table?
   "Returns true if the collection of ints can fit within the
   max-table-switch-size, false otherwise."
   [ints]
   (< (- (apply max (seq ints)) (apply min (seq ints))) max-switch-table-size))
 
-(defn- prep-ints
+#_(defn- prep-ints
   "Takes a sequence of int-sized test constants and a corresponding sequence of
   then expressions. Returns a tuple of [shift mask case-map switch-type] where
   case-map is a map of int case values to [test then] tuples, and switch-type
@@ -5938,7 +5938,7 @@
         ; compact case ints, with shift-mask
         [shift mask (case-map #(shift-mask shift mask (int %)) int tests thens) :compact]))))
 
-(defn- merge-hash-collisions
+#_(defn- merge-hash-collisions
   "Takes a case expression, default expression, and a sequence of test constants
   and a corresponding sequence of then expressions. Returns a tuple of
   [tests thens skip-check-set] where no tests have the same hash. Each set of
@@ -5974,7 +5974,7 @@
                      (into1 #{}))]
     [(keys hmap) (vals hmap) skip-check]))
 
-(defn- prep-hashes
+#_(defn- prep-hashes
   "Takes a sequence of test constants and a corresponding sequence of then
   expressions. Returns a tuple of [shift mask case-map switch-type skip-check]
   where case-map is a map of int case values to [test then] tuples, switch-type
@@ -6003,7 +6003,7 @@
         [shift mask case-map switch-type skip-check]))))
 
 
-(defmacro case 
+#_(defmacro case
   "Takes an expression, and a set of clauses.
 
   Each clause can take the form of either:
