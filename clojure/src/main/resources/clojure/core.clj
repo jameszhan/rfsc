@@ -2967,82 +2967,17 @@
                                    ~@(when needrec [recform]))))))])))))]
     (nth (step nil (seq seq-exprs)) 1)))
 
-#_(defn await
-  "Blocks the current thread (indefinitely!) until all actions
-  dispatched thus far, from this thread or agent, to the agent(s) have
-  occurred.  Will block on failed agents.  Will never return if
-  a failed agent is restarted with :clear-actions true."
-  {:added "1.0"
-   :static true}
-  [& agents]
-  (io! "await in transaction"
-    (when *agent*
-      (throw (new Exception "Can't await in agent action")))
-    (let [latch (new java.util.concurrent.CountDownLatch (count agents))
-          count-down (fn [agent] (. latch (countDown)) agent)]
-      (doseq [agent agents]
-        (send agent count-down))
-      (. latch (await)))))
 
-#_(defn ^:static await1 [^clojure.lang.Agent a]
-  (when (pos? (.getQueueCount a))
-    (await a))
-    a)
-
-#_(defn await-for
-  "Blocks the current thread until all actions dispatched thus
-  far (from this thread or agent) to the agents have occurred, or the
-  timeout (in milliseconds) has elapsed. Returns logical false if
-  returning due to timeout, logical true otherwise."
-  {:added "1.0"
-   :static true}
-  [timeout-ms & agents]
-    (io! "await-for in transaction"
-     (when *agent*
-       (throw (new Exception "Can't await in agent action")))
-     (let [latch (new java.util.concurrent.CountDownLatch (count agents))
-           count-down (fn [agent] (. latch (countDown)) agent)]
-       (doseq [agent agents]
-           (send agent count-down))
-       (. latch (await  timeout-ms (. java.util.concurrent.TimeUnit MILLISECONDS))))))
-
-(defmacro dotimes
-  "bindings => name n
-
-  Repeatedly executes body (presumably for side-effects) with name
-  bound to integers from 0 through n-1."
-  {:added "1.0"}
-  [bindings & body]
-  (assert-args
-     (vector? bindings) "a vector for its binding"
-     (= 2 (count bindings)) "exactly 2 forms in binding vector")
-  (let [i (first bindings)
-        n (second bindings)]
-    `(let [n# (long ~n)]
-       (loop [~i 0]
-         (when (< ~i n#)
-           ~@body
-           (recur (unchecked-inc ~i)))))))
-
-#_(defn into
-  "Returns a new coll consisting of to-coll with all of the items of
-  from-coll conjoined."
-  {:added "1.0"}
-  [to from]
-    (let [ret to items (seq from)]
-      (if items
-        (recur (conj ret (first items)) (next items))
-        ret)))
 
 ;;;;;;;;;;;;;;;;;;;;; editable collections ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defn transient 
+(defn transient
   "Returns a new, transient version of the collection, in constant time."
   {:added "1.1"
    :static true}
-  [^clojure.lang.IEditableCollection coll] 
+  [^clojure.lang.IEditableCollection coll]
   (.asTransient coll))
 
-(defn persistent! 
+(defn persistent!
   "Returns a new, persistent version of the transient collection, in
   constant time. The transient collection cannot be used after this
   call, any such use will throw an exception."
@@ -3059,51 +2994,6 @@
   [^clojure.lang.ITransientCollection coll x]
   (.conj coll x))
 
-(defn assoc!
-  "When applied to a transient map, adds mapping of key(s) to
-  val(s). When applied to a transient vector, sets the val at index.
-  Note - index must be <= (count vector). Returns coll."
-  {:added "1.1"
-   :static true}
-  ([^clojure.lang.ITransientAssociative coll key val] (.assoc coll key val))
-  ([^clojure.lang.ITransientAssociative coll key val & kvs]
-   (let [ret (.assoc coll key val)]
-     (if kvs
-       (recur ret (first kvs) (second kvs) (nnext kvs))
-       ret))))
-
-(defn dissoc!
-  "Returns a transient map that doesn't contain a mapping for key(s)."
-  {:added "1.1"
-   :static true}
-  ([^clojure.lang.ITransientMap map key] (.without map key))
-  ([^clojure.lang.ITransientMap map key & ks]
-   (let [ret (.without map key)]
-     (if ks
-       (recur ret (first ks) (next ks))
-       ret))))
-
-(defn pop!
-  "Removes the last item from a transient vector. If
-  the collection is empty, throws an exception. Returns coll"
-  {:added "1.1"
-   :static true}
-  [^clojure.lang.ITransientVector coll] 
-  (.pop coll)) 
-
-(defn disj!
-  "disj[oin]. Returns a transient set of the same (hashed/sorted) type, that
-  does not contain key(s)."
-  {:added "1.1"
-   :static true}
-  ([set] set)
-  ([^clojure.lang.ITransientSet set key]
-   (. set (disjoin key)))
-  ([^clojure.lang.ITransientSet set key & ks]
-   (let [ret (. set (disjoin key))]
-     (if ks
-       (recur ret (first ks) (next ks))
-       ret))))
 
 ;redef into with batch support
 (defn ^:private into1
@@ -3116,7 +3006,7 @@
     (persistent! (reduce1 conj! (transient to) from))
     (reduce1 conj to from)))
 
-(defmacro import 
+(defmacro import
   "import-list => (package-symbol class-name-symbols*)
 
   For each name in class-name-symbols, adds a mapping from name to the
@@ -3143,13 +3033,13 @@
   {:added "1.0"
    :static true}
   ([aseq]
-     (clojure.lang.RT/seqToTypedArray (seq aseq)))
+    (clojure.lang.RT/seqToTypedArray (seq aseq)))
   ([type aseq]
-     (clojure.lang.RT/seqToTypedArray type (seq aseq))))
+    (clojure.lang.RT/seqToTypedArray type (seq aseq))))
 
 (defn ^{:private true}
   array [& items]
-    (into-array items))
+  (into-array items))
 
 (defn class
   "Returns the Class of x"
@@ -3157,12 +3047,13 @@
    :static true}
   ^Class [^Object x] (if (nil? x) x (. x (getClass))))
 
-(defn type 
+(defn type
   "Returns the :type metadata of x, or its Class if none"
   {:added "1.0"
    :static true}
   [x]
   (or (get (meta x) :type) (class x)))
+
 
 (defn num
   "Coerce to Number"
@@ -3210,154 +3101,9 @@
 (defn boolean
   "Coerce to boolean"
   {
-   :inline (fn  [x] `(. clojure.lang.RT (booleanCast ~x)))
-   :added "1.0"}
+    :inline (fn  [x] `(. clojure.lang.RT (booleanCast ~x)))
+    :added "1.0"}
   [x] (clojure.lang.RT/booleanCast x))
-
-(defn unchecked-byte
-  "Coerce to byte. Subject to rounding or truncation."
-  {:inline (fn  [x] `(. clojure.lang.RT (uncheckedByteCast ~x)))
-   :added "1.3"}
-  [^Number x] (clojure.lang.RT/uncheckedByteCast x))
-
-(defn unchecked-short
-  "Coerce to short. Subject to rounding or truncation."
-  {:inline (fn  [x] `(. clojure.lang.RT (uncheckedShortCast ~x)))
-   :added "1.3"}
-  [^Number x] (clojure.lang.RT/uncheckedShortCast x))
-
-(defn unchecked-char
-  "Coerce to char. Subject to rounding or truncation."
-  {:inline (fn  [x] `(. clojure.lang.RT (uncheckedCharCast ~x)))
-   :added "1.3"}
-  [x] (. clojure.lang.RT (uncheckedCharCast x)))
-
-(defn unchecked-int
-  "Coerce to int. Subject to rounding or truncation."
-  {:inline (fn  [x] `(. clojure.lang.RT (uncheckedIntCast ~x)))
-   :added "1.3"}
-  [^Number x] (clojure.lang.RT/uncheckedIntCast x))
-
-(defn unchecked-long
-  "Coerce to long. Subject to rounding or truncation."
-  {:inline (fn  [x] `(. clojure.lang.RT (uncheckedLongCast ~x)))
-   :added "1.3"}
-  [^Number x] (clojure.lang.RT/uncheckedLongCast x))
-
-(defn unchecked-float
-  "Coerce to float. Subject to rounding."
-  {:inline (fn  [x] `(. clojure.lang.RT (uncheckedFloatCast ~x)))
-   :added "1.3"}
-  [^Number x] (clojure.lang.RT/uncheckedFloatCast x))
-
-(defn unchecked-double
-  "Coerce to double. Subject to rounding."
-  {:inline (fn  [x] `(. clojure.lang.RT (uncheckedDoubleCast ~x)))
-   :added "1.3"}
-  [^Number x] (clojure.lang.RT/uncheckedDoubleCast x))
-
-
-(defn number?
-  "Returns true if x is a Number"
-  {:added "1.0"
-   :static true}
-  [x]
-  (instance? Number x))
-
-(defn mod
-  "Modulus of num and div. Truncates toward negative infinity."
-  {:added "1.0"
-   :static true}
-  [num div] 
-  (let [m (rem num div)] 
-    (if (or (zero? m) (= (pos? num) (pos? div)))
-      m 
-      (+ m div))))
-
-(defn ratio?
-  "Returns true if n is a Ratio"
-  {:added "1.0"
-   :static true}
-  [n] (instance? clojure.lang.Ratio n))
-
-(defn numerator
-  "Returns the numerator part of a Ratio."
-  {:tag BigInteger
-   :added "1.2"
-   :static true}
-  [r]
-  (.numerator ^clojure.lang.Ratio r))
-
-(defn denominator
-  "Returns the denominator part of a Ratio."
-  {:tag BigInteger
-   :added "1.2"
-   :static true}
-  [r]
-  (.denominator ^clojure.lang.Ratio r))
-
-(defn decimal?
-  "Returns true if n is a BigDecimal"
-  {:added "1.0"
-   :static true}
-  [n] (instance? BigDecimal n))
-
-(defn float?
-  "Returns true if n is a floating point number"
-  {:added "1.0"
-   :static true}
-  [n]
-  (or (instance? Double n)
-      (instance? Float n)))
-
-(defn rational? 
-  "Returns true if n is a rational number"
-  {:added "1.0"
-   :static true}
-  [n]
-  (or (integer? n) (ratio? n) (decimal? n)))
-
-(defn bigint
-  "Coerce to BigInt"
-  {:tag clojure.lang.BigInt
-   :static true
-   :added "1.3"}
-  [x] (cond
-       (instance? clojure.lang.BigInt x) x
-       (instance? BigInteger x) (clojure.lang.BigInt/fromBigInteger x)
-       (decimal? x) (bigint (.toBigInteger ^BigDecimal x))
-       (float? x)  (bigint (. BigDecimal valueOf (double x)))
-       (ratio? x) (bigint (.bigIntegerValue ^clojure.lang.Ratio x))
-       (number? x) (clojure.lang.BigInt/valueOf (long x))
-       :else (bigint (BigInteger. x))))
-
-(defn biginteger
-  "Coerce to BigInteger"
-  {:tag BigInteger
-   :added "1.0"
-   :static true}
-  [x] (cond
-       (instance? BigInteger x) x
-       (instance? clojure.lang.BigInt x) (.toBigInteger ^clojure.lang.BigInt x)
-       (decimal? x) (.toBigInteger ^BigDecimal x)
-       (float? x) (.toBigInteger (. BigDecimal valueOf (double x)))
-       (ratio? x) (.bigIntegerValue ^clojure.lang.Ratio x)
-       (number? x) (BigInteger/valueOf (long x))
-       :else (BigInteger. x)))
-
-(defn bigdec
-  "Coerce to BigDecimal"
-  {:tag BigDecimal
-   :added "1.0"
-   :static true}
-  [x] (cond
-       (decimal? x) x
-       (float? x) (. BigDecimal valueOf (double x))
-       (ratio? x) (/ (BigDecimal. (.numerator ^clojure.lang.Ratio x)) (.denominator ^clojure.lang.Ratio x))
-       (instance? clojure.lang.BigInt x) (.toBigDecimal ^clojure.lang.BigInt x)
-       (instance? BigInteger x) (BigDecimal. ^BigInteger x)
-       (number? x) (BigDecimal/valueOf (long x))
-       :else (BigDecimal. x)))
 
 (def ^:dynamic ^{:private true} print-initialized false)
 
