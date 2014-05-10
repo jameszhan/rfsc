@@ -19,8 +19,8 @@ public class Module {
     private final ClassWorld classWorld;
     private final String realmId;
     private final String parentRealmId;
-    private final Collection<URL> urls = new ArrayList<>();
-    private final Collection<Map.Entry<String, String>> dependencies = new ArrayList<>();
+    private final Collection<URL> urls = new ArrayList<URL>();
+    private final Collection<Map.Entry<String, String>> dependencies = new ArrayList<Map.Entry<String, String>>();
 
     public Module(ClassWorld classWorld, String realmId, String parentRealmId) {
         this.classWorld = classWorld;
@@ -31,10 +31,10 @@ public class Module {
     public Module addDependency(String realmId, String... packages) {
         if (packages != null && packages.length > 0) {
             for (String packageName : packages) {
-                dependencies.add(new AbstractMap.SimpleEntry<>(realmId, packageName));
+                dependencies.add(new AbstractMap.SimpleEntry<String, String>(realmId, packageName));
             }
         } else {
-            dependencies.add(new AbstractMap.SimpleEntry<>(realmId, (String)null));
+            dependencies.add(new AbstractMap.SimpleEntry<String, String>(realmId, (String)null));
         }
         return this;
     }

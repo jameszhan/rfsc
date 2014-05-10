@@ -34,7 +34,7 @@ public class Loader {
     private final String baseDir;
     private final ClassWorld classWorld;
     private final boolean excludeTestAndSource;
-    private final Map<String, ModuleLoader> moduleLoaders = new HashMap<>();
+    private final Map<String, ModuleLoader> moduleLoaders = new HashMap<String, ModuleLoader>();
 
     public Loader(String baseDir) {
         this(baseDir, true);
