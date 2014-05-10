@@ -360,7 +360,7 @@ by default when a new command-line REPL is started."} repl-requires
      "-?"     help-opt} opt)
    script-opt))
 
-(defn- legacy-repl
+#_(defn- legacy-repl
   "Called by the clojure.lang.Repl.main stub to run a repl with args
   specified the old way"
   [args]
@@ -370,7 +370,7 @@ java -cp clojure.jar clojure.main -i init.clj -r args...")
   (let [[inits [sep & args]] (split-with (complement #{"--"}) args)]
     (repl-opt (concat ["-r"] args) (map vector (repeat "-i") inits))))
 
-(defn- legacy-script
+#_(defn- legacy-script
   "Called by the clojure.lang.Script.main stub to run a script with args
   specified the old way"
   [args]

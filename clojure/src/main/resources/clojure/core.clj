@@ -723,6 +723,7 @@
    :static true}
   [x] (. clojure.lang.Delay (force x)))
 
+
 (defmacro if-not
   "Evaluates test. If logical false, evaluates and returns then expr, 
   otherwise else expr, if supplied, else nil."
@@ -755,24 +756,6 @@
      (if (next more)
        (recur y (first more) (next more))
        (clojure.lang.Util/equiv y (first more)))
-     false)))
-
-;equals-based
-#_(defn =
-  "Equality. Returns true if x equals y, false if not. Same as Java
-  x.equals(y) except it also works for nil. Boxed numbers must have
-  same type. Clojure's immutable data structures define equals() (and
-  thus =) as a value, not an identity, comparison."
-  {:inline (fn [x y] `(. clojure.lang.Util equals ~x ~y))
-   :inline-arities #{2}
-   :added "1.0"}
-  ([x] true)
-  ([x y] (clojure.lang.Util/equals x y))
-  ([x y & more]
-   (if (= x y)
-     (if (next more)
-       (recur y (first more) (next more))
-       (= y (first more)))
      false)))
 
 (defn not=
@@ -3919,7 +3902,7 @@
                             (str sym " does not exist")))))
             (. *ns* (refer (or (rename sym) sym) v)))))))
 
-(defn ns-refers
+#_(defn ns-refers
   "Returns a map of the refer mappings for the namespace."
   {:added "1.0"
    :static true}
@@ -3939,14 +3922,14 @@
   [alias namespace-sym]
   (.addAlias *ns* alias (the-ns namespace-sym)))
 
-(defn ns-aliases
+#_(defn ns-aliases
   "Returns a map of the aliases for the namespace."
   {:added "1.0"
    :static true}
   [ns]
   (.getAliases (the-ns ns)))
 
-(defn ns-unalias
+#_(defn ns-unalias
   "Removes the alias for the symbol from the namespace."
   {:added "1.0"
    :static true}
@@ -4796,148 +4779,11 @@
   (when (instance? clojure.lang.IPersistentCollection coll)
     (.empty ^clojure.lang.IPersistentCollection coll)))
 
-(defmacro amap
-  "Maps an expression across an array a, using an index named idx, and
-  return value named ret, initialized to a clone of a, then setting 
-  each element of ret to the evaluation of expr, returning the new 
-  array ret."
-  {:added "1.0"}
-  [a idx ret expr]
-  `(let [a# ~a
-         ~ret (aclone a#)]
-     (loop  [~idx 0]
-       (if (< ~idx  (alength a#))
-         (do
-           (aset ~ret ~idx ~expr)
-           (recur (unchecked-inc ~idx)))
-         ~ret))))
 
-(defmacro areduce
-  "Reduces an expression across an array a, using an index named idx,
-  and return value named ret, initialized to init, setting ret to the 
-  evaluation of expr at each step, returning ret."
-  {:added "1.0"}
-  [a idx ret init expr]
-  `(let [a# ~a]
-     (loop  [~idx 0 ~ret ~init]
-       (if (< ~idx  (alength a#))
-         (recur (unchecked-inc ~idx) ~expr)
-         ~ret))))
-
-(defn float-array
-  "Creates an array of floats"
-  {:inline (fn [& args] `(. clojure.lang.Numbers float_array ~@args))
-   :inline-arities #{1 2}
-   :added "1.0"}
-  ([size-or-seq] (. clojure.lang.Numbers float_array size-or-seq))
-  ([size init-val-or-seq] (. clojure.lang.Numbers float_array size init-val-or-seq)))
-
-(defn boolean-array
-  "Creates an array of booleans"
-  {:inline (fn [& args] `(. clojure.lang.Numbers boolean_array ~@args))
-   :inline-arities #{1 2}
-   :added "1.1"}
-  ([size-or-seq] (. clojure.lang.Numbers boolean_array size-or-seq))
-  ([size init-val-or-seq] (. clojure.lang.Numbers boolean_array size init-val-or-seq)))
-
-(defn byte-array
-  "Creates an array of bytes"
-  {:inline (fn [& args] `(. clojure.lang.Numbers byte_array ~@args))
-   :inline-arities #{1 2}
-   :added "1.1"}
-  ([size-or-seq] (. clojure.lang.Numbers byte_array size-or-seq))
-  ([size init-val-or-seq] (. clojure.lang.Numbers byte_array size init-val-or-seq)))
-
-(defn char-array
-  "Creates an array of chars"
-  {:inline (fn [& args] `(. clojure.lang.Numbers char_array ~@args))
-   :inline-arities #{1 2}
-   :added "1.1"}
-  ([size-or-seq] (. clojure.lang.Numbers char_array size-or-seq))
-  ([size init-val-or-seq] (. clojure.lang.Numbers char_array size init-val-or-seq)))
-
-(defn short-array
-  "Creates an array of shorts"
-  {:inline (fn [& args] `(. clojure.lang.Numbers short_array ~@args))
-   :inline-arities #{1 2}
-   :added "1.1"}
-  ([size-or-seq] (. clojure.lang.Numbers short_array size-or-seq))
-  ([size init-val-or-seq] (. clojure.lang.Numbers short_array size init-val-or-seq)))
-
-(defn double-array
-  "Creates an array of doubles"
-  {:inline (fn [& args] `(. clojure.lang.Numbers double_array ~@args))
-   :inline-arities #{1 2}
-   :added "1.0"}
-  ([size-or-seq] (. clojure.lang.Numbers double_array size-or-seq))
-  ([size init-val-or-seq] (. clojure.lang.Numbers double_array size init-val-or-seq)))
-
-(defn object-array
-  "Creates an array of objects"
-  {:inline (fn [arg] `(. clojure.lang.RT object_array ~arg))
-   :inline-arities #{1}
-   :added "1.2"}
-  ([size-or-seq] (. clojure.lang.RT object_array size-or-seq)))
-
-(defn int-array
-  "Creates an array of ints"
-  {:inline (fn [& args] `(. clojure.lang.Numbers int_array ~@args))
-   :inline-arities #{1 2}
-   :added "1.0"}
-  ([size-or-seq] (. clojure.lang.Numbers int_array size-or-seq))
-  ([size init-val-or-seq] (. clojure.lang.Numbers int_array size init-val-or-seq)))
-
-(defn long-array
-  "Creates an array of longs"
-  {:inline (fn [& args] `(. clojure.lang.Numbers long_array ~@args))
-   :inline-arities #{1 2}
-   :added "1.0"}
-  ([size-or-seq] (. clojure.lang.Numbers long_array size-or-seq))
-  ([size init-val-or-seq] (. clojure.lang.Numbers long_array size init-val-or-seq)))
-
-(definline booleans
-  "Casts to boolean[]"
-  {:added "1.1"}
-  [xs] `(. clojure.lang.Numbers booleans ~xs))
-
-(definline bytes
-  "Casts to bytes[]"
-  {:added "1.1"}
-  [xs] `(. clojure.lang.Numbers bytes ~xs))
-
-(definline chars
-  "Casts to chars[]"
-  {:added "1.1"}
-  [xs] `(. clojure.lang.Numbers chars ~xs))
-
-(definline shorts
-  "Casts to shorts[]"
-  {:added "1.1"}
-  [xs] `(. clojure.lang.Numbers shorts ~xs))
-
-(definline floats
-  "Casts to float[]"
-  {:added "1.0"}
-  [xs] `(. clojure.lang.Numbers floats ~xs))
-
-(definline ints
-  "Casts to int[]"
-  {:added "1.0"}
-  [xs] `(. clojure.lang.Numbers ints ~xs))
-
-(definline doubles
-  "Casts to double[]"
-  {:added "1.0"}
-  [xs] `(. clojure.lang.Numbers doubles ~xs))
-
-(definline longs
-  "Casts to long[]"
-  {:added "1.0"}
-  [xs] `(. clojure.lang.Numbers longs ~xs))
 
 (import '(java.util.concurrent BlockingQueue LinkedBlockingQueue))
 
-(defn seque
+#_(defn seque
   "Creates a queued seq on another (presumably lazy) seq s. The queued
   seq will produce a concrete seq in the background, and can get up to
   n items ahead of the consumer. n-or-q can be an integer n buffer
@@ -5137,33 +4983,6 @@
                 (into1 (set (bases tag)) tp)
                 tp)))))
 
-(defn ancestors
-  "Returns the immediate and indirect parents of tag, either via a Java type
-  inheritance relationship or a relationship established via derive. h
-  must be a hierarchy obtained from make-hierarchy, if not supplied
-  defaults to the global hierarchy"
-  {:added "1.0"}
-  ([tag] (ancestors global-hierarchy tag))
-  ([h tag] (not-empty
-            (let [ta (get (:ancestors h) tag)]
-              (if (class? tag)
-                (let [superclasses (set (supers tag))]
-                  (reduce1 into1 superclasses
-                    (cons ta
-                          (map #(get (:ancestors h) %) superclasses))))
-                ta)))))
-
-(defn descendants
-  "Returns the immediate and indirect children of tag, through a
-  relationship established via derive. h must be a hierarchy obtained
-  from make-hierarchy, if not supplied defaults to the global
-  hierarchy. Note: does not work on Java type inheritance
-  relationships."
-  {:added "1.0"}
-  ([tag] (descendants global-hierarchy tag))
-  ([h tag] (if (class? tag)
-             (throw (java.lang.UnsupportedOperationException. "Can't get descendants of classes"))
-             (not-empty (get (:descendants h) tag)))))
 
 (defn derive
   "Establishes a parent/child relationship between parent and
@@ -6320,16 +6139,6 @@
   [vec f init]
   (.kvreduce vec f init)))
 
-(defn reduce-kv
-  "Reduces an associative collection. f should be a function of 3
-  arguments. Returns the result of applying f to init, the first key
-  and the first value in coll, then applying f to that result and the
-  2nd key and value, etc. If coll contains no entries, returns init
-  and f is not called. Note that reduce-kv is supported on vectors,
-  where the keys will be the ordinals."
-  {:added "1.4"}
-  ([f init coll]
-     (clojure.core.protocols/kv-reduce coll f init)))
 
 (defn into
   "Returns a new coll consisting of to-coll with all of the items of
@@ -6340,69 +6149,6 @@
   (if (instance? clojure.lang.IEditableCollection to)
     (with-meta (persistent! (reduce conj! (transient to) from)) (meta to))
     (reduce conj to from)))
-
-(defn mapv
-  "Returns a vector consisting of the result of applying f to the
-  set of first items of each coll, followed by applying f to the set
-  of second items in each coll, until any one of the colls is
-  exhausted.  Any remaining items in other colls are ignored. Function
-  f should accept number-of-colls arguments."
-  {:added "1.4"
-   :static true}
-  ([f coll]
-     (-> (reduce (fn [v o] (conj! v (f o))) (transient []) coll)
-         persistent!))
-  ([f c1 c2]
-     (into [] (map f c1 c2)))
-  ([f c1 c2 c3]
-     (into [] (map f c1 c2 c3)))
-  ([f c1 c2 c3 & colls]
-     (into [] (apply map f c1 c2 c3 colls))))
-
-(defn filterv
-  "Returns a vector of the items in coll for which
-  (pred item) returns true. pred must be free of side-effects."
-  {:added "1.4"
-   :static true}
-  [pred coll]
-  (-> (reduce (fn [v o] (if (pred o) (conj! v o) v))
-              (transient [])
-              coll)
-      persistent!))
-
-(require '[clojure.java.io :as jio])
-
-(defn- normalize-slurp-opts
-  [opts]
-  (if (string? (first opts))
-    (do
-      (println "WARNING: (slurp f enc) is deprecated, use (slurp f :encoding enc).")
-      [:encoding (first opts)])
-    opts))
-
-(defn slurp
-  "Opens a reader on f and reads all its contents, returning a string.
-  See clojure.java.io/reader for a complete list of supported arguments."
-  {:added "1.0"}
-  ([f & opts]
-     (let [opts (normalize-slurp-opts opts)
-           sb (StringBuilder.)]
-       (with-open [^java.io.Reader r (apply jio/reader f opts)]
-         (loop [c (.read r)]
-           (if (neg? c)
-             (str sb)
-             (do
-               (.append sb (char c))
-               (recur (.read r)))))))))
-
-(defn spit
-  "Opposite of slurp.  Opens f with writer, writes content, then
-  closes f. Options passed to clojure.java.io/writer."
-  {:added "1.2"}
-  [f content & options]
-  (with-open [^java.io.Writer w (apply jio/writer f options)]
-    (.write w (str content))))
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; clojure version number ;;;;;;;;;;;;;;;;;;;;;;
 

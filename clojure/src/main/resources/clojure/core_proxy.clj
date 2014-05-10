@@ -362,14 +362,14 @@
       (call)
       (finally (update-proxy this m)))))
 
-(defmacro proxy-super 
+(defmacro proxy-super
   "Use to call a superclass method in the body of a proxy method. 
   Note, expansion captures 'this"
   {:added "1.0"}
   [meth & args]
  `(proxy-call-with-super (fn [] (. ~'this ~meth ~@args))  ~'this ~(name meth)))
 
-(defn bean
+#_(defn bean
   "Takes a Java object and returns a read-only implementation of the
   map abstraction based upon its JavaBean properties."
   {:added "1.0"}

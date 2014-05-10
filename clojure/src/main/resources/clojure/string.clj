@@ -43,13 +43,13 @@ Design notes for clojure.string:
   (:import (java.util.regex Pattern Matcher)
            clojure.lang.LazilyPersistentVector))
 
-(defn ^String reverse
+#_(defn ^String reverse
   "Returns s with its characters reversed."
   {:added "1.2"}
   [^CharSequence s]
   (.toString (.reverse (StringBuilder. s))))
 
-(defn ^String re-quote-replacement
+#_(defn ^String re-quote-replacement
   "Given a replacement string that you wish to be a literal
    replacement for a pattern match in replace or replace-first, do the
    necessary escaping of special characters in the replacement."
@@ -106,7 +106,7 @@ Design notes for clojure.string:
                                  (replace-by s match replacement))
      :else (throw (IllegalArgumentException. (str "Invalid match arg: " match))))))
 
-(defn- replace-first-by
+#_(defn- replace-first-by
   [^CharSequence s ^Pattern re f]
   (let [m (re-matcher re s)]
     (if (.find m)
@@ -117,7 +117,7 @@ Design notes for clojure.string:
         (str buffer))
       s)))
 
-(defn- replace-first-char
+#_(defn- replace-first-char
   [^CharSequence s ^Character match replace]
   (let [s (.toString s)
         i (.indexOf s (int match))]
@@ -125,7 +125,7 @@ Design notes for clojure.string:
       s
       (str (subs s 0 i) replace (subs s (inc i))))))
 
-(defn- replace-first-str
+#_(defn- replace-first-str
   [^CharSequence s ^String match ^String replace]
   (let [^String s (.toString s)
         i (.indexOf s match)]
@@ -133,7 +133,7 @@ Design notes for clojure.string:
       s
       (str (subs s 0 i) replace (subs s (+ i (.length match)))))))
 
-(defn ^String replace-first
+#_(defn ^String replace-first
   "Replaces the first instance of match with replacement in s.
 
    match/replacement can be:
@@ -175,7 +175,7 @@ Design notes for clojure.string:
      :else (throw (IllegalArgumentException. (str "Invalid match arg: " match))))))
 
 
-(defn ^String join
+#_(defn ^String join
   "Returns a string of all elements in coll, as returned by (seq coll),
    separated by an optional separator."
   {:added "1.2"}
@@ -191,7 +191,7 @@ Design notes for clojure.string:
                 sep)
          (str sb)))))
 
-(defn ^String capitalize
+#_(defn ^String capitalize
   "Converts first character of the string to upper-case, all other
   characters to lower-case."
   {:added "1.2"}
@@ -202,19 +202,19 @@ Design notes for clojure.string:
       (str (.toUpperCase (subs s 0 1))
            (.toLowerCase (subs s 1))))))
 
-(defn ^String upper-case
+#_(defn ^String upper-case
   "Converts string to all upper-case."
   {:added "1.2"}
   [^CharSequence s]
   (.. s toString toUpperCase))
 
-(defn ^String lower-case
+#_(defn ^String lower-case
   "Converts string to all lower-case."
   {:added "1.2"}
   [^CharSequence s]
   (.. s toString toLowerCase))
 
-(defn split
+#_(defn split
   "Splits string on a regular expression.  Optional argument limit is
   the maximum number of splits. Not lazy. Returns vector of the splits."
   {:added "1.2"}
@@ -223,13 +223,13 @@ Design notes for clojure.string:
   ([ ^CharSequence s ^Pattern re limit]
      (LazilyPersistentVector/createOwning (.split re s limit))))
 
-(defn split-lines
+#_(defn split-lines
   "Splits s on \\n or \\r\\n."
   {:added "1.2"}
   [^CharSequence s]
   (split s #"\r?\n"))
 
-(defn ^String trim
+#_(defn ^String trim
   "Removes whitespace from both ends of string."
   {:added "1.2"}
   [^CharSequence s]
@@ -246,7 +246,7 @@ Design notes for clojure.string:
               (recur (inc lindex))
               (.. s (subSequence lindex rindex) toString))))))))
 
-(defn ^String triml
+#_(defn ^String triml
   "Removes whitespace from the left side of string."
   {:added "1.2"}
   [^CharSequence s]
@@ -258,7 +258,7 @@ Design notes for clojure.string:
           (recur (unchecked-inc index))
           (.. s (subSequence index len) toString))))))
 
-(defn ^String trimr
+#_(defn ^String trimr
   "Removes whitespace from the right side of string."
   {:added "1.2"}
   [^CharSequence s]
@@ -269,7 +269,7 @@ Design notes for clojure.string:
         (recur (unchecked-dec index))
         (.. s (subSequence 0 index) toString)))))
 
-(defn ^String trim-newline
+#_(defn ^String trim-newline
   "Removes all trailing newline \\n or return \\r characters from
   string.  Similar to Perl's chomp."
   {:added "1.2"}
@@ -282,7 +282,7 @@ Design notes for clojure.string:
           (recur (dec index))
           (.. s (subSequence 0 index) toString))))))
 
-(defn blank?
+#_(defn blank?
   "True if s is nil, empty, or contains only whitespace."
   {:added "1.2"}
   [^CharSequence s]
@@ -295,7 +295,7 @@ Design notes for clojure.string:
           false)))
     true))
 
-(defn ^String escape
+#_(defn ^String escape
   "Return a new string, using cmap to escape each character ch
    from s as follows:
    
