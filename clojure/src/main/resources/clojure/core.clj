@@ -5779,40 +5779,10 @@
            ~@body))
 
 
-;;;;;;; case ;;;;;;;;;;;;;
-(defn- shift-mask [shift mask x]
-  (-> x (bit-shift-right shift) (bit-and mask)))
-
-(def ^:private max-mask-bits 13)
-#_(def ^:private max-switch-table-size (bit-shift-left 1 max-mask-bits))
-
-(defn- maybe-min-hash
-  "takes a collection of hashes and returns [shift mask] or nil if none found"
-  [hashes]
-  (first
-    (filter (fn [[s m]]
-              (apply distinct? (map #(shift-mask s m %) hashes)))
-            (for [mask (map #(dec (bit-shift-left 1 %)) (range 1 (inc max-mask-bits)))
-                  shift (range 0 31)]
-              [shift mask]))))
-
-;; redefine reduce with internal-reduce
-(defn reduced
-  "Wraps x in a way such that a reduce will terminate with the value x"
-  {:added "1.5"}
-  [x]
-  (clojure.lang.Reduced. x))
-
-(defn reduced?
-  "Returns true if x is the result of a call to reduced"
-  {:inline (fn [x] `(clojure.lang.RT/isReduced ~x ))
-   :inline-arities #{1}
-   :added "1.5"}
-  ([x] (clojure.lang.RT/isReduced x)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; helper files ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (alter-meta! (find-ns 'clojure.core) assoc :doc "Fundamental library of the Clojure language")
-(load "core_proxy")   ;WARNING it can be removed, but some funcationalities will not working
+(load "core_proxy")   ;;TODO it can be removed, but some funcationalities will not working
 (load "core_print")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; clojure version number ;;;;;;;;;;;;;;;;;;;;;;
