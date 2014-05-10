@@ -2699,37 +2699,6 @@
    :deprecated "1.3"}
   [n x] (take n (repeat x)))
 
-(defn iterate
-  "Returns a lazy sequence of x, (f x), (f (f x)) etc. f must be free of side-effects"
-  {:added "1.0"
-   :static true}
-  [f x] (cons x (lazy-seq (iterate f (f x)))))
-
-(defn range
-  "Returns a lazy seq of nums from start (inclusive) to end
-  (exclusive), by step, where start defaults to 0, step to 1, and end to
-  infinity. When step is equal to 0, returns an infinite sequence of
-  start. When start is equal to end, returns empty list."
-  {:added "1.0"
-   :static true}
-  ([] (range 0 Double/POSITIVE_INFINITY 1))
-  ([end] (range 0 end 1))
-  ([start end] (range start end 1))
-  ([start end step]
-   (lazy-seq
-    (let [b (chunk-buffer 32)
-          comp (cond (or (zero? step) (= start end)) not=
-                     (pos? step) <
-                     (neg? step) >)]
-      (loop [i start]
-        (if (and (< (count b) 32)
-                 (comp i end))
-          (do
-            (chunk-append b i)
-            (recur (+ i step)))
-          (chunk-cons (chunk b) 
-                      (when (comp i end) 
-                        (range i end step)))))))))
 
 (defn merge
   "Returns a map that consists of the rest of the maps conj-ed onto
@@ -2741,61 +2710,12 @@
   (when (some identity maps)
     (reduce1 #(conj (or %1 {}) %2) maps)))
 
-(defn merge-with
-  "Returns a map that consists of the rest of the maps conj-ed onto
-  the first.  If a key occurs in more than one map, the mapping(s)
-  from the latter (left-to-right) will be combined with the mapping in
-  the result by calling (f val-in-result val-in-latter)."
-  {:added "1.0"
-   :static true}
-  [f & maps]
-  (when (some identity maps)
-    (let [merge-entry (fn [m e]
-			(let [k (key e) v (val e)]
-			  (if (contains? m k)
-			    (assoc m k (f (get m k) v))
-			    (assoc m k v))))
-          merge2 (fn [m1 m2]
-		   (reduce1 merge-entry (or m1 {}) (seq m2)))]
-      (reduce1 merge2 maps))))
-
-
-
-(defn zipmap
-  "Returns a map with the keys mapped to the corresponding vals."
-  {:added "1.0"
-   :static true}
-  [keys vals]
-    (loop [map {}
-           ks (seq keys)
-           vs (seq vals)]
-      (if (and ks vs)
-        (recur (assoc map (first ks) (first vs))
-               (next ks)
-               (next vs))
-        map)))
 
 (defmacro declare
   "defs the supplied var names with no bindings, useful for making forward declarations."
   {:added "1.0"}
   [& names] `(do ~@(map #(list 'def (vary-meta % assoc :declared true)) names)))
 
-(defn line-seq
-  "Returns the lines of text from rdr as a lazy sequence of strings.
-  rdr must implement java.io.BufferedReader."
-  {:added "1.0"
-   :static true}
-  [^java.io.BufferedReader rdr]
-  (when-let [line (.readLine rdr)]
-    (cons line (lazy-seq (line-seq rdr)))))
-
-(defn comparator
-  "Returns an implementation of java.util.Comparator based upon pred."
-  {:added "1.0"
-   :static true}
-  [pred]
-    (fn [x y]
-      (cond (pred x y) -1 (pred y x) 1 :else 0)))
 
 (defn sort
   "Returns a sorted sequence of the items in coll. If no comparator is
