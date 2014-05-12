@@ -208,8 +208,9 @@ public final class TraceClassVisitor extends ClassVisitor {
     public void visitEnd() {
         p.visitClassEnd();
         if (pw != null) {
-            pw.format("\n=================(%s)==================\n", name);
+            pw.format("\n=================begin (%s)==================\n", name);
             p.print(pw);
+            pw.format("\n=================done (%s)==================\n", name);
             pw.flush();
         }
         super.visitEnd();
