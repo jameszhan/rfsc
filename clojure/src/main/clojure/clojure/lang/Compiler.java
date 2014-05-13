@@ -6069,7 +6069,7 @@ public class Compiler implements Opcodes {
         return x;
     }
 
-    static Object macroexpand(Object form) {
+    public static Object macroexpand(Object form) {
         Object exf = macroexpand1(form);
         if (exf != form)
             return macroexpand(exf);
