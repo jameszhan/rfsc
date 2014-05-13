@@ -314,7 +314,7 @@ public class Compiler implements Opcodes {
     ;
     static final public Class RECUR_CLASS = Recur.class;
 
-    interface Expr {
+    public interface Expr {
         Object eval();
 
         void emit(C context, ObjExpr objx, GeneratorAdapter gen);
@@ -1296,7 +1296,7 @@ public class Compiler implements Opcodes {
         }
     }
 
-    static class InstanceMethodExpr extends MethodExpr {
+    public static class InstanceMethodExpr extends MethodExpr {
         public final Expr target;
         public final String methodName;
         public final IPersistentVector args;
@@ -1450,7 +1450,7 @@ public class Compiler implements Opcodes {
     }
 
 
-    static class StaticMethodExpr extends MethodExpr {
+    public static class StaticMethodExpr extends MethodExpr {
         //final String className;
         public final Class c;
         public final String methodName;
