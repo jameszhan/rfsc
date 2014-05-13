@@ -30,9 +30,12 @@
 package clojure.asm.util;
 
 import java.io.PrintWriter;
+import java.io.StringWriter;
 
 import clojure.asm.AnnotationVisitor;
 import clojure.asm.ClassVisitor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A {@link clojure.asm.ClassVisitor} that prints the classes it visits with a
@@ -77,6 +80,8 @@ import clojure.asm.ClassVisitor;
  * @author Eugene Kuleshov
  */
 public final class TraceClassVisitor extends ClassVisitor {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(TraceClassVisitor.class);
 
     private final String name;
 
@@ -207,10 +212,15 @@ public final class TraceClassVisitor extends ClassVisitor {
     @Override
     public void visitEnd() {
         p.visitClassEnd();
+        if (LOGGER.isDebugEnabled()){
+            LOGGER.debug("\n=================begin {} ==================\n", name);
+            StringWriter out = new StringWriter();
+            p.print(new PrintWriter(out));
+            LOGGER.debug(out.toString());
+            LOGGER.debug("\n=================done {} ==================\n", name);
+        }
         if (pw != null) {
-            pw.format("\n=================begin (%s)==================\n", name);
             p.print(pw);
-            pw.format("\n=================done (%s)==================\n", name);
             pw.flush();
         }
         super.visitEnd();

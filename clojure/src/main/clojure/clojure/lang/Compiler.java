@@ -3816,7 +3816,7 @@ public class Compiler implements Opcodes {
             //TODO hacking with my debuging
             //ClassVisitor cv = cw;
 		    //ClassVisitor cv = new TraceClassVisitor(new CheckClassAdapter(cw), new PrintWriter(System.out));
-            ClassVisitor cv = new TraceClassVisitor(cw, new PrintWriter(System.out), "ObjExpr");
+            ClassVisitor cv = new TraceClassVisitor(cw, null, "ObjExpr");
             cv.visit(V1_5, ACC_PUBLIC + ACC_SUPER + ACC_FINAL, internalName, null, superName, interfaceNames);
 //		         superName != null ? superName :
 //		         (isVariadic() ? "clojure/lang/RestFn" : "clojure/lang/AFunction"), null);
@@ -6657,7 +6657,7 @@ public class Compiler implements Opcodes {
             objx.objtype = Type.getObjectType(objx.internalName);
             ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
             //ClassVisitor cv = cw;
-            ClassVisitor cv = new TraceClassVisitor(cw, new PrintWriter(System.out), "Static Compile");
+            ClassVisitor cv = new TraceClassVisitor(cw, null, "Static Compile");
             cv.visit(V1_5, ACC_PUBLIC + ACC_SUPER, objx.internalName, null, "java/lang/Object", null);
 
             //static load method
@@ -6946,7 +6946,7 @@ public class Compiler implements Opcodes {
             ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
 
             //ClassVisitor cv = cw;
-            ClassVisitor cv = new TraceClassVisitor(cw, new PrintWriter(System.out), "NewInstanceExpr compileStub");
+            ClassVisitor cv = new TraceClassVisitor(cw, null, "NewInstanceExpr compileStub");
             cv.visit(V1_5, ACC_PUBLIC + ACC_SUPER, COMPILE_STUB_PREFIX + "/" + ret.internalName,
                     null, superName, interfaceNames);
 
