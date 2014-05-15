@@ -366,7 +366,7 @@ public class Compiler implements Opcodes {
 
     }
 
-    static class DefExpr implements Expr {
+    public static class DefExpr implements Expr {
         public final Var var;
         public final Expr init;
         public final Expr meta;
@@ -726,7 +726,7 @@ public class Compiler implements Opcodes {
         }
     }
 
-    static interface AssignableExpr {
+    public static interface AssignableExpr {
         Object evalAssign(Expr val);
 
         void emitAssign(C context, ObjExpr objx, GeneratorAdapter gen, Expr val);
@@ -738,7 +738,7 @@ public class Compiler implements Opcodes {
         public void emitUnboxed(C context, ObjExpr objx, GeneratorAdapter gen);
     }
 
-    static public abstract class HostExpr implements Expr, MaybePrimitiveExpr {
+    public static abstract class HostExpr implements Expr, MaybePrimitiveExpr {
         final static Type BOOLEAN_TYPE = Type.getType(Boolean.class);
         final static Type CHAR_TYPE = Type.getType(Character.class);
         final static Type INTEGER_TYPE = Type.getType(Integer.class);
@@ -1023,7 +1023,7 @@ public class Compiler implements Opcodes {
         }
     }
 
-    static abstract class FieldExpr extends HostExpr {
+    public static abstract class FieldExpr extends HostExpr {
     }
 
     static class InstanceFieldExpr extends FieldExpr implements AssignableExpr {
@@ -1134,7 +1134,7 @@ public class Compiler implements Opcodes {
         }
     }
 
-    static class StaticFieldExpr extends FieldExpr implements AssignableExpr {
+    public static class StaticFieldExpr extends FieldExpr implements AssignableExpr {
         //final String className;
         public final String fieldName;
         public final Class c;
@@ -1695,7 +1695,7 @@ public class Compiler implements Opcodes {
         }
     }
 
-    static class ConstantExpr extends LiteralExpr {
+    public static class ConstantExpr extends LiteralExpr {
         //stuff quoted vals in classloader at compile time, pull out at runtime
         //this won't work for static compilation...
         public final Object v;
@@ -1766,7 +1766,7 @@ public class Compiler implements Opcodes {
         }
     }
 
-    static class NilExpr extends LiteralExpr {
+    public static class NilExpr extends LiteralExpr {
         Object val() {
             return null;
         }
@@ -1822,7 +1822,7 @@ public class Compiler implements Opcodes {
     final static BooleanExpr TRUE_EXPR = new BooleanExpr(true);
     final static BooleanExpr FALSE_EXPR = new BooleanExpr(false);
 
-    static class StringExpr extends LiteralExpr {
+    public static class StringExpr extends LiteralExpr {
         public final String str;
 
         public StringExpr(String str) {

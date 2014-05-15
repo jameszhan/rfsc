@@ -115,16 +115,39 @@ public class ReadMacro {
         Assert.assertNull(((Cons) obj).next().next());
     }
 
-    //@Test
+    @Test
     public void meta(){
-        String quote = "^{:macro true}";
-        Object obj = read(quote);
-        LOGGER.info("{} => {}", quote, obj);
-        Assert.assertTrue(obj instanceof Cons);
-        Assert.assertEquals(2, ((Cons) obj).count());
-        Assert.assertEquals(Symbol.intern("clojure.core/deref"), ((Cons) obj).first());
-        Assert.assertEquals(Symbol.intern("fn"), ((Cons) obj).next().first());
-        Assert.assertNull(((Cons) obj).next().next());
+        String meta = "^{:macro true} hello";
+        Object obj = read(meta);
+        LOGGER.info("{} => {}", meta, obj);
+        Assert.assertTrue(obj instanceof Symbol);
+        Assert.assertEquals(1, ((Symbol) obj).meta().count());
+        Assert.assertEquals(true, ((Symbol) obj).meta().containsKey(Keyword.intern("macro")));
+        Assert.assertEquals(true, ((Symbol) obj).meta().entryAt(Keyword.intern("macro")).getValue());
+
+        meta = "^:dynamic hello";
+        obj = read(meta);
+        LOGGER.info("{} => {}", meta, obj);
+        Assert.assertTrue(obj instanceof Symbol);
+        Assert.assertEquals(1, ((Symbol) obj).meta().count());
+        Assert.assertEquals(true, ((Symbol) obj).meta().containsKey(Keyword.intern("dynamic")));
+        Assert.assertEquals(true, ((Symbol) obj).meta().entryAt(Keyword.intern("dynamic")).getValue());
+
+        meta = "^String hello";
+        obj = read(meta);
+        LOGGER.info("{} => {}", meta, obj);
+        Assert.assertTrue(obj instanceof Symbol);
+        Assert.assertEquals(1, ((Symbol) obj).meta().count());
+        Assert.assertEquals(true, ((Symbol) obj).meta().containsKey(Keyword.intern("tag")));
+        Assert.assertEquals(Symbol.intern("String"), ((Symbol) obj).meta().entryAt(Keyword.intern("tag")).getValue());
+
+        meta = "^{:tag java.lang.String} hello";
+        obj = read(meta);
+        LOGGER.info("{} => {}", meta, obj);
+        Assert.assertTrue(obj instanceof Symbol);
+        Assert.assertEquals(1, ((Symbol) obj).meta().count());
+        Assert.assertEquals(true, ((Symbol) obj).meta().containsKey(Keyword.intern("tag")));
+        Assert.assertEquals(Symbol.intern("java.lang.String"), ((Symbol) obj).meta().entryAt(Keyword.intern("tag")).getValue());
     }
 
     @Test
