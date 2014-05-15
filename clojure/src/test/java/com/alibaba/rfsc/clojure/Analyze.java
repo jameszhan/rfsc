@@ -132,26 +132,37 @@ public class Analyze {
     }
 
     private void defTest(Compiler.C type){
-        String exprString = "(def ^:dynamic hello 'hello)";
-        Compiler.Expr expr = Compiler.analyze(type, read(exprString));
-        LOGGER.info("{} => {}", exprString, expr);
+        Var.pushThreadBindings(RT.map(Compiler.LOADER, RT.makeClassLoader()));
+        try {
+            String exprString = "(def ^:dynamic hello (fn* add1 ([x] (+ x 1))))";
+            Compiler.Expr expr = Compiler.analyze(type, read(exprString));
+            LOGGER.info("{} => {}", exprString, expr);
 
-        Symbol hello = Symbol.intern("clojure.core", "hello");
-        Assert.assertEquals(Var.find(hello), expr.eval());
-        Assert.assertTrue(expr.hasJavaClass());
-        Assert.assertEquals(Var.class, expr.getJavaClass());
+            Symbol hello = Symbol.intern("clojure.core", "hello");
+            Assert.assertEquals(Var.find(hello), expr.eval());
+            Assert.assertTrue(expr.hasJavaClass());
+            Assert.assertEquals(Var.class, expr.getJavaClass());
 
-        Assert.assertTrue(expr instanceof Compiler.DefExpr);
-        Compiler.DefExpr expression = (Compiler.DefExpr)expr;
+            Assert.assertTrue(expr instanceof Compiler.DefExpr);
+            Compiler.DefExpr expression = (Compiler.DefExpr)expr;
 
-        Assert.assertEquals("NO_SOURCE_FILE", expression.source);
-        Assert.assertEquals(0, expression.column);
-        Assert.assertEquals(0, expression.line);
-        Assert.assertEquals(Var.find(hello), expression.var);
+            Assert.assertEquals("NO_SOURCE_FILE", expression.source);
+            Assert.assertEquals(0, expression.column);
+            Assert.assertEquals(0, expression.line);
+            Assert.assertEquals(Var.find(hello), expression.var);
 
-        Assert.assertTrue(expression.init instanceof Compiler.ConstantExpr);
-        Assert.assertTrue(expression.initProvided);
-        Assert.assertTrue(expression.isDynamic);
+            Assert.assertTrue(expression.initProvided);
+            Assert.assertTrue(expression.isDynamic);
+            Assert.assertTrue(expression.init instanceof Compiler.FnExpr);
+
+            Assert.assertEquals("clojure.core$add1", ((Compiler.FnExpr) expression.init).name());
+            Assert.assertEquals("clojure/core$add1", ((Compiler.FnExpr) expression.init).internalName());
+            Assert.assertEquals("add1", ((Compiler.FnExpr) expression.init).thisName());
+            Assert.assertArrayEquals(PersistentVector.create(Var.find(Symbol.intern("clojure.core", "+")), 1l).toArray(), ((Compiler.FnExpr) expression.init).constants().toArray());
+            Assert.assertEquals(AFunction.class, expression.init.getJavaClass());
+        } finally {
+            Var.popThreadBindings();
+        }
     }
 
     @Test
@@ -188,20 +199,36 @@ public class Analyze {
     }
 
     private void letTest(Compiler.C type){
-        String exprString = "(let* [a 1] (+ a 1))";
-        Compiler.Expr expr = Compiler.analyze(type, read(exprString));
-        LOGGER.info("{} => {}", exprString, expr);
+        Var.pushThreadBindings(RT.map(Compiler.LOADER, RT.makeClassLoader()));
+        try {
+            String exprString = "(let* [i 3] (.substring \"hello world\", i, 8))";
+            Compiler.Expr expr = Compiler.analyze(type, read(exprString));
+            LOGGER.info("{} => {}", exprString, expr);
 
-        Symbol hello = Symbol.intern("clojure.core", "hello");
-        Assert.assertEquals(Var.find(hello), expr.eval());
-        Assert.assertTrue(expr.hasJavaClass());
-        Assert.assertEquals(null, expr.getJavaClass());
+            Assert.assertEquals("lo wo", expr.eval());
+            Assert.assertFalse(expr.hasJavaClass());
 
-        Assert.assertTrue(expr instanceof Compiler.AssignExpr);
-        Compiler.AssignExpr expression = (Compiler.AssignExpr)expr;
+            Assert.assertTrue(expr instanceof Compiler.InvokeExpr);
+            Compiler.InvokeExpr expression = (Compiler.InvokeExpr)expr;
 
-        Assert.assertEquals(Compiler.StaticFieldExpr.class, expression.target.getClass());
-        Assert.assertEquals(null, expression.val.eval());
+            Assert.assertEquals(null, expression.tag);
+            Assert.assertEquals(null, expression.onMethod);
+            Assert.assertEquals(null, expression.protocolOn);
+            Assert.assertEquals("NO_SOURCE_FILE", expression.source);
+            Assert.assertEquals(PersistentVector.create(), expression.args);
+
+            Compiler.FnExpr fexpr = (Compiler.FnExpr)expression.fexpr;
+
+            Assert.assertTrue(fexpr.name().startsWith("clojure.core$fn__"));
+            Assert.assertTrue(fexpr.internalName().startsWith("clojure/core$fn__"));
+            Assert.assertEquals(null, fexpr.thisName());
+            Assert.assertArrayEquals(PersistentVector.create(3l, 8l).toArray(), fexpr.constants().toArray());
+
+            AFunction fn = (AFunction) fexpr.eval();
+            Assert.assertEquals("lo wo", fn.invoke());
+        } finally {
+            Var.popThreadBindings();
+        }
     }
 
 
