@@ -35,3 +35,36 @@ Var
 每一个表达式（例：(+ 1 2)）都会生成一个AFunction的子类。
 
 
+表达式
+
+quote ->
+    LiteralExpr
+        ConstantExpr
+        NilExpr
+        BooleanExpr
+        NumberExpr
+        StringExpr
+        EmptyExpr
+
+
+form                |   expr
+--                  |   --
+null                |   NIL_EXPR
+true                |   TRUE_EXPR
+false               |   FALSE_EXPR
+Number              |   (case val (Integer Long Double) NumberExpr ConstantExpr)
+Symbol              |
+Keyword             |   KeywordExpr
+StringExpr          |   StringExpr
+empty collection    |   EmptyExpr
+ISeq                |
+IPersistentVector   |   VectorExpr?
+IRecord             |   ConstantExpr
+IType               |   ConstantExpr
+IPersistentMap      |   MapExpr?
+IPersistentSet      |   SetExpr?
+
+
+
+
+

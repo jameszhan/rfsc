@@ -1636,7 +1636,7 @@ public class Compiler implements Opcodes {
         }
     }
 
-    static class NumberExpr extends LiteralExpr implements MaybePrimitiveExpr {
+    public static class NumberExpr extends LiteralExpr implements MaybePrimitiveExpr {
         final Number n;
         public final int id;
 
