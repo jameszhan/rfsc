@@ -8,12 +8,14 @@ package com.alibaba.rfsc.clojure;
 import clojure.lang.*;
 import clojure.lang.Compiler;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.PushbackReader;
 import java.io.StringReader;
+import java.util.Arrays;
 
 /**
  * Created with IntelliJ IDEA.
@@ -26,6 +28,11 @@ public class Expr {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReadMacro.class);
     private static final Object EOF = new Object();
+
+    @BeforeClass
+    public static void loadRT() {
+        RT.init();   //Load RT for testing
+    }
 
     @Test
     public void exprForKeyword(){
@@ -129,6 +136,122 @@ public class Expr {
     }
 
 
+    @Test
+    public void exprForFn(){
+        Var.pushThreadBindings(RT.map(Compiler.LOADER, RT.makeClassLoader()));
+        try {
+            String expressionString = "(fn* [x] (+ x 1))";
+            ISeq list = (ISeq)read(expressionString);
+            Compiler.Expr expr = Compiler.FnExpr.parse(Compiler.C.EXPRESSION, list, "hello");
+            LOGGER.info("{} => {}", expressionString, expr);
+            Assert.assertEquals(AFunction.class, expr.getJavaClass());
+            Assert.assertTrue(expr instanceof Compiler.FnExpr);
+            Compiler.FnExpr fnExpr = (Compiler.FnExpr)expr;
+            LOGGER.info("{}, {}, {}, {}, {}, {}, {}, {}, {}", fnExpr.thisName(), fnExpr.name(), fnExpr.internalName(),
+                    fnExpr.vars(), fnExpr.constants(), fnExpr.closes(), fnExpr.keywords(), fnExpr.objtype(), fnExpr.variadicMethod());
+            Assert.assertEquals("clojure.core$hello", fnExpr.name());
+            Assert.assertEquals(1, fnExpr.methods().count());
+            Assert.assertEquals(3l, ((AFunction)expr.eval()).invoke(2l));
+
+
+            expressionString = "(fn* hello1 [&form &env & decl] (cons &form decl))";
+            list = (ISeq)read(expressionString);
+            expr = Compiler.FnExpr.parse(Compiler.C.EXPRESSION, list, "hello");
+            LOGGER.info("{} => {}", expressionString, expr);
+            Assert.assertEquals(AFunction.class, expr.getJavaClass());
+            Assert.assertTrue(expr instanceof Compiler.FnExpr);
+            fnExpr = (Compiler.FnExpr)expr;
+            LOGGER.info("{}, {}, {}, {}, {}, {}, {}, {}, {}", fnExpr.thisName(), fnExpr.name(), fnExpr.internalName(),
+                    fnExpr.vars(), fnExpr.constants(), fnExpr.closes(), fnExpr.keywords(), fnExpr.objtype(), fnExpr.variadicMethod());
+            Assert.assertEquals("clojure.core$hello1", fnExpr.name());
+            Assert.assertEquals(1, fnExpr.methods().count());
+            Assert.assertEquals("(2 (3 1))", ((AFunction)expr.eval()).invoke(2, PersistentArrayMap.EMPTY, PersistentList.create(Arrays.asList(3, 1))).toString());
+
+
+            expressionString = "(fn* hello2 ([x] (+ x 1)) ([x y] (+ x y 3)))";
+            list = (ISeq)read(expressionString);
+            expr = Compiler.FnExpr.parse(Compiler.C.EXPRESSION, list, "hello");
+            LOGGER.info("{} => {}", expressionString, expr);
+            Assert.assertEquals(AFunction.class, expr.getJavaClass());
+            Assert.assertTrue(expr instanceof Compiler.FnExpr);
+            fnExpr = (Compiler.FnExpr)expr;
+            LOGGER.info("{}, {}, {}, {}, {}, {}, {}, {}, {}", fnExpr.thisName(), fnExpr.name(), fnExpr.internalName(),
+                    fnExpr.vars(), fnExpr.constants(), fnExpr.closes(), fnExpr.keywords(), fnExpr.objtype(), fnExpr.variadicMethod());
+            Assert.assertEquals("clojure.core$hello2", fnExpr.name());
+            Assert.assertEquals(2, fnExpr.methods().count());
+            Assert.assertEquals(3l, ((AFunction)expr.eval()).invoke(2l));
+            Assert.assertEquals(8l, ((AFunction)expr.eval()).invoke(2l, 3l));
+        } finally {
+            Var.popThreadBindings();
+        }
+    }
+
+    @Test
+    public void exprForDef(){
+        Compiler.IParser parser = (Compiler.IParser)Compiler.specials.valAt(Symbol.intern("def"));
+        Var.pushThreadBindings(RT.map(Compiler.LOADER, RT.makeClassLoader()));
+        try {
+            String expressionString = "(def hello (fn [x] (+ x 1)))";
+            ISeq list = (ISeq)read(expressionString);
+            Compiler.Expr expr = parser.parse(Compiler.C.EVAL, list);
+            LOGGER.info("{} => {}", expressionString, expr);
+            Assert.assertEquals(Var.class, expr.getJavaClass());
+            Assert.assertTrue(expr instanceof Compiler.DefExpr);
+            Compiler.DefExpr defExpr = (Compiler.DefExpr)expr;
+            LOGGER.info("{}, {}, {}, {}, {}, {}, {}, {}, {}", defExpr.meta, defExpr.var, defExpr.init,
+                    defExpr.initProvided, defExpr.isDynamic, defExpr.source);
+            Assert.assertEquals(3l, ((Var)expr.eval()).invoke(2l));
+        } finally {
+            Var.popThreadBindings();
+        }
+    }
+
+    //@Test
+    public void exprForLet(){
+        Compiler.IParser parser = (Compiler.IParser)Compiler.specials.valAt(Symbol.intern("let*"));
+        Var.pushThreadBindings(RT.map(Compiler.LOADER, RT.makeClassLoader()));
+        try {
+            String expressionString = "(let* [y 3] (+ y 6))";
+            ISeq list = (ISeq)read(expressionString);
+            Var.pushThreadBindings(RT.map(Compiler.LINE, 0, Compiler.COLUMN, 0));
+            try {
+                Compiler.Expr expr = parser.parse(Compiler.C.EVAL, list);
+                LOGGER.info("{} => {}", expressionString, expr);
+                Assert.assertEquals(IFn.class, expr.getJavaClass());
+                Assert.assertTrue(expr instanceof Compiler.LetExpr);
+                Compiler.LetExpr letExpr = (Compiler.LetExpr)expr;
+                LOGGER.info("{}, {}, {}, {}, {}, {}, {}, {}, {}", letExpr.bindingInits, letExpr.body, letExpr.isLoop);
+                Assert.assertEquals(9l, ((IFn)expr.eval()).invoke());
+            } finally {
+                Var.popThreadBindings();
+            }
+        } finally {
+            Var.popThreadBindings();
+        }
+    }
+
+    @Test
+    public void exprForInvoker(){
+        Var.pushThreadBindings(RT.map(Compiler.LOADER, RT.makeClassLoader()));
+        try {
+            String expressionString = "^int (+ 1 2)";
+            ISeq list = (ISeq)read(expressionString);
+            Var.pushThreadBindings(RT.map(Compiler.LINE, 0, Compiler.COLUMN, 0));
+            try {
+                Compiler.Expr expr = Compiler.InvokeExpr.parse(Compiler.C.EVAL, list);
+                LOGGER.info("{} => {}", expressionString, expr);
+                Assert.assertTrue(expr instanceof Compiler.InvokeExpr);
+                Compiler.InvokeExpr invokeExpr = (Compiler.InvokeExpr)expr;
+                LOGGER.info("{}, {}, {}, {}, {}, {}, {}, {}, {}", invokeExpr.args, invokeExpr.fexpr, invokeExpr.tag,
+                        invokeExpr.isDirect, invokeExpr.isProtocol, invokeExpr.onMethod, invokeExpr.protocolOn);
+                Assert.assertEquals(3l, expr.eval());
+            } finally {
+                Var.popThreadBindings();
+            }
+        } finally {
+            Var.popThreadBindings();
+        }
+    }
 
     private static Object read(String expr) {
         return LispReader.read(new PushbackReader(new StringReader(expr)), false, EOF, false);

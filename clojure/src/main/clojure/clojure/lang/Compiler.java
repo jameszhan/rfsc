@@ -335,7 +335,7 @@ public class Compiler implements Opcodes {
         }
     }
 
-    interface IParser {
+    public interface IParser {
         Expr parse(C context, Object form);
     }
 
@@ -462,7 +462,7 @@ public class Compiler implements Opcodes {
             return Var.class;
         }
 
-        static class Parser implements IParser {
+        public static class Parser implements IParser {
             public Expr parse(C context, Object form) {
                 //(def x) or (def x initexpr) or (def x "docstring" initexpr)
                 String docstring = null;
@@ -3516,7 +3516,7 @@ public class Compiler implements Opcodes {
             }
         }
 
-        static Expr parse(C context, ISeq form, String name) {
+        public static Expr parse(C context, ISeq form, String name) {
             ISeq origForm = form;
             FnExpr fn = new FnExpr(tagOf(form));
             fn.src = form;
@@ -4697,7 +4697,7 @@ public class Compiler implements Opcodes {
             return null;
         }
 
-        static FnMethod parse(ObjExpr objx, ISeq form, boolean isStatic) {
+        public static FnMethod parse(ObjExpr objx, ISeq form, boolean isStatic) {
             //([args] body...)
             IPersistentVector parms = (IPersistentVector) RT.first(form);
             ISeq body = RT.next(form);
@@ -5548,8 +5548,12 @@ public class Compiler implements Opcodes {
                     return analyze(context, RT.list(RT.list(FNONCE, PersistentVector.EMPTY, form)));
 
                 ObjMethod method = (ObjMethod) METHOD.deref();
-                IPersistentMap backupMethodLocals = method.locals;
-                IPersistentMap backupMethodIndexLocals = method.indexlocals;
+                IPersistentMap backupMethodLocals = null;
+                IPersistentMap backupMethodIndexLocals = null;
+                if (method != null) {
+                    backupMethodLocals = method.locals;
+                    backupMethodIndexLocals = method.indexlocals;
+                }
                 IPersistentVector recurMismatches = PersistentVector.EMPTY;
                 for (int i = 0; i < bindings.count() / 2; i++) {
                     recurMismatches = recurMismatches.cons(RT.F);
@@ -5559,8 +5563,10 @@ public class Compiler implements Opcodes {
                 while (true) {
                     IPersistentMap dynamicBindings = RT.map(LOCAL_ENV, LOCAL_ENV.deref(),
                             NEXT_LOCAL_NUM, NEXT_LOCAL_NUM.deref());
-                    method.locals = backupMethodLocals;
-                    method.indexlocals = backupMethodIndexLocals;
+                    if (method != null) {
+                        method.locals = backupMethodLocals;
+                        method.indexlocals = backupMethodIndexLocals;
+                    }
 
                     PathNode looproot = new PathNode(PATHTYPE.PATH, (PathNode) CLEAR_PATH.get());
                     PathNode clearroot = new PathNode(PATHTYPE.PATH, looproot);
