@@ -56,13 +56,13 @@ Number              |   (case val (Integer Long Double) NumberExpr ConstantExpr)
 Symbol              |
 Keyword             |   KeywordExpr
 StringExpr          |   StringExpr
-empty collection    |   EmptyExpr
+empty collection    |   (if (is-meta) MetaExpr EmptyExpr)
 ISeq                |
-IPersistentVector   |   VectorExpr?
+IPersistentVector   |   VectorExpr or ConstantExpr
 IRecord             |   ConstantExpr
 IType               |   ConstantExpr
-IPersistentMap      |   MapExpr?
-IPersistentSet      |   SetExpr?
+IPersistentMap      |   MapExpr or ConstantExpr
+IPersistentSet      |   SetExpr or ConstantExpr
 
 
 

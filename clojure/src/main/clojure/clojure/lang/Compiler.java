@@ -6177,7 +6177,7 @@ public class Compiler implements Opcodes {
         return v.count();
     }
 
-    private static KeywordExpr registerKeyword(Keyword keyword) {
+    public static KeywordExpr registerKeyword(Keyword keyword) {
         if (!KEYWORDS.isBound())
             return new KeywordExpr(keyword);
 
@@ -6255,7 +6255,7 @@ public class Compiler implements Opcodes {
             ADD_ANNOTATIONS.invoke(visitor, meta, i);
     }
 
-    private static Expr analyzeSymbol(Symbol sym) {
+    public static Expr analyzeSymbol(Symbol sym) {
         Symbol tag = tagOf(sym);
         if (sym.ns == null) //ns-qualified syms are always Vars
         {
