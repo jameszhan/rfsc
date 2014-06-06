@@ -67,7 +67,7 @@ IPersistentSet      |   SetExpr or ConstantExpr
 对于ISeq的处理，首先宏展开(调用macroexpand1)，如果是宏，则重新analyze展开后的结果，如果不是宏，则按照如下方式处理
 如果op是fn*，则调用FnExpr进行解析。(fn name [args] body...), (fn name ([args] body...) ([args2] body2...) ...) (fn [args] body...) or (fn ([args] body...) ([args2] body2...) ...)
 如果是special form，则调用其专用的parse进行处理，下面使用DefExpr和LetExpr进行分析
-
+否则，InvokeExpr.parse得到InvokeExpr
 
 
 
