@@ -5,8 +5,6 @@
  */
 package com.alibaba.rfsc.hadoop;
 
-import java.util.Calendar;
-
 /**
  * Created with IntelliJ IDEA.
  *
@@ -17,9 +15,6 @@ import java.util.Calendar;
 public class WordCount {
 
     public static void main(String[] args) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(2014, 4, 1);
-        calendar.add(Calendar.DATE, 10000);
-        System.out.println(calendar.getTime());
+
     }
 }
