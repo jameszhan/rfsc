@@ -178,6 +178,7 @@
         <module>guice</module>
         <module>bigdata</module>
         <module>clojure</module>
+        <module>kindle</module>
     </modules>
 
 </project>
