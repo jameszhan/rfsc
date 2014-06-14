@@ -1,6 +1,6 @@
 grammar Clojure ;
 
-r           : (s_exp)* ; //-> ^(PROGRAM sexpr*);
+prog        : (s_exp)* ; //-> ^(PROGRAM sexpr*);
 
 s_exp       : QUOTE?(list|atom) ;
 

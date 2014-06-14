@@ -5,7 +5,7 @@ options {
 }
 
 
-r                   : assign ;
+prog                : assign ;
 assign              : ID '=' expression ';' ;
 expression          : INT | array;
 

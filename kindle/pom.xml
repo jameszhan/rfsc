@@ -13,6 +13,13 @@
     <build>
         <resources>
             <resource>
+                <directory>src/main/generated</directory>
+                <filtering>true</filtering>
+                <excludes>
+                    <exclude>**/*.java</exclude>
+                </excludes>
+            </resource>
+            <resource>
                 <directory>src/main/config</directory>
                 <filtering>true</filtering>
                 <includes>
@@ -20,15 +27,6 @@
                 </includes>
             </resource>
         </resources>
-        <testResources>
-            <testResource>
-                <directory>gen</directory>
-                <filtering>true</filtering>
-                <excludes>
-                    <exclude>**/*.java</exclude>
-                </excludes>
-            </testResource>
-        </testResources>
     </build>
 
     <dependencies>
