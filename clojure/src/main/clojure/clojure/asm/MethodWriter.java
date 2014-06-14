@@ -2492,7 +2492,7 @@ class MethodWriter extends MethodVisitor {
                  * new frames may be needed for jump instructions that were
                  * inserted by this method. And updating the offsets or
                  * inserting frames can change the format of the following
-                 * frames, in case of packed frames. In topdown the whole table
+                 * frames, in case of packed frames. In sample the whole table
                  * must be recomputed. For this the frames are marked as
                  * potentially invalid. This will cause the whole class to be
                  * reread and rewritten with the COMPUTE_FRAMES option (see the

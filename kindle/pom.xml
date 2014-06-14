@@ -23,6 +23,10 @@
         <testResources>
             <testResource>
                 <directory>gen</directory>
+                <filtering>true</filtering>
+                <excludes>
+                    <exclude>**/*.java</exclude>
+                </excludes>
             </testResource>
         </testResources>
     </build>
