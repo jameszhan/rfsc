@@ -1,4 +1,9 @@
+
 grammar Athena ;
+
+options {
+}
+
 
 r                   : assign ;
 assign              : ID '=' expression ';' ;

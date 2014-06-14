@@ -148,14 +148,14 @@ fromSource
     ;
 
 tableBucketSample
-@init { gParent.pushMsg("table bucket sample specification", state); }
+@init { gParent.pushMsg("table bucket samples specification", state); }
 @after { gParent.popMsg(state); }
     :
     KW_TABLESAMPLE LPAREN KW_BUCKET (numerator=Number) KW_OUT KW_OF (denominator=Number) (KW_ON expr+=expression (COMMA expr+=expression)*)? RPAREN -> ^(TOK_TABLEBUCKETSAMPLE $numerator $denominator $expr*)
     ;
 
 splitSample
-@init { gParent.pushMsg("table split sample specification", state); }
+@init { gParent.pushMsg("table split samples specification", state); }
 @after { gParent.popMsg(state); }
     :
     KW_TABLESAMPLE LPAREN  (numerator=Number) (percent=KW_PERCENT|KW_ROWS) RPAREN
@@ -167,7 +167,7 @@ splitSample
     ;
 
 tableSample
-@init { gParent.pushMsg("table sample specification", state); }
+@init { gParent.pushMsg("table samples specification", state); }
 @after { gParent.popMsg(state); }
     :
     tableBucketSample |

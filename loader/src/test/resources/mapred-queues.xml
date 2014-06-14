@@ -73,7 +73,7 @@
     <acl-administer-jobs> </acl-administer-jobs>
   </queue>
 
-  <!-- Here is a sample of a hierarchical queue configuration
+  <!-- Here is a samples of a hierarchical queue configuration
        where q2 is a child of q1. In this example, q2 is a leaf level
        queue as it has no queues configured within it. Currently, ACLs
        and state are only supported for the leaf level queues.

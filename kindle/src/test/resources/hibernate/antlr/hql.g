@@ -242,7 +242,7 @@ assignment
 	: stateField EQ^ newValue
 	;
 
-// "state_field" is the term used in the EJB3 sample grammar; used here for easy reference.
+// "state_field" is the term used in the EJB3 samples grammar; used here for easy reference.
 // it is basically a property ref
 stateField
 	: path
