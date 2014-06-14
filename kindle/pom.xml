@@ -10,7 +10,30 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>kindle</artifactId>
 
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/config</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/*.properties</include>
+                </includes>
+            </resource>
+        </resources>
+        <testResources>
+            <testResource>
+                <directory>gen</directory>
+            </testResource>
+        </testResources>
+    </build>
+
     <dependencies>
+
+        <dependency>
+            <groupId>org.antlr</groupId>
+            <artifactId>antlr4</artifactId>
+            <version>4.2.2</version>
+        </dependency>
 
     </dependencies>
 </project>
