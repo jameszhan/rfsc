@@ -3,13 +3,10 @@
  * Alibaba.com ("Confidential Information"). You shall not disclose such Confidential Information and shall use it only
  * in accordance with the terms of the license agreement you entered into with Alibaba.com.
  */
-package com.alibaba.asm.generated;
+package com.mulberry.athena.asm;
 
 import com.mulberry.athena.compile.DynamicClassLoader;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.Type;
+import org.objectweb.asm.*;
 import org.objectweb.asm.commons.GeneratorAdapter;
 import org.objectweb.asm.commons.Method;
 import org.objectweb.asm.util.TraceClassVisitor;
@@ -36,25 +33,22 @@ public class ClassGenerator {
     public final static Method voidctor = Method.getMethod("void <init>()");
     public final static Method clinit = Method.getMethod("void <clinit>()");
 
-    public void generateClass(String name, String superClass, String signature, String[] interfaceNames) {
+    public static void generateClass(String name, String signature, String superClass, String[] interfaceNames) {
         ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
-        ClassVisitor cv = new TraceClassVisitor(new PrintWriter(System.out));
-        cv.visit(V1_5, ACC_PUBLIC + ACC_SUPER + ACC_FINAL, name, signature, superClass, interfaceNames);
+
+        ClassVisitor cv = new TraceClassVisitor(cw, new PrintWriter(System.out));
+        cv.visit(V1_6, ACC_PUBLIC + ACC_SUPER + ACC_FINAL, name, signature, superClass, interfaceNames);
+
+        generateClinit(cv);
+        generateInit(cv, superClass, new Type[0]);
 
         cv.visitEnd();
-        Class<?> clazz =new DynamicClassLoader().defineClass("Hello", cw.toByteArray());
+        Class<?> clazz =new DynamicClassLoader().defineClass(name, cw.toByteArray());
         System.out.println(clazz);
     }
 
-    public static void main(String[] args) {
-        ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
-        ClassVisitor cv = new TraceClassVisitor(new PrintWriter(System.out));
-        cv.visit(V1_6, ACC_PUBLIC + ACC_SUPER + ACC_FINAL, "Hello", null, null, null);
-        generateClinit(cv);
-        generateInit(cv, "java/lang/Object", new Type[0]);
-        cv.visitEnd();
-        Class<?> clazz =new DynamicClassLoader().defineClass("Hello", cw.toByteArray());
-        System.out.println(clazz);
+    public static void main(String[] args) throws Exception {
+        generateClass("Hello", null, "java/lang/Object", null);
     }
 
     public static void generateClinit(ClassVisitor cv){

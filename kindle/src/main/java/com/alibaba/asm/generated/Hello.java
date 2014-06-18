@@ -16,6 +16,7 @@ import org.objectweb.asm.commons.Method;
 import org.objectweb.asm.util.TraceClassVisitor;
 
 import java.io.*;
+import java.util.Arrays;
 
 /**
  * Created with IntelliJ IDEA.
@@ -30,7 +31,7 @@ public class Hello {
 
     public static void main(String[] args) throws IOException{
         ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
-        ClassVisitor cv = new TraceClassVisitor(new PrintWriter(System.out));
+        ClassVisitor cv = new TraceClassVisitor(cw, new PrintWriter(System.out));
         cv.visit(V1_5, ACC_PUBLIC + ACC_SUPER + ACC_FINAL, "HelloWorld", null, "java.lang.Object", new String[]{
                 "java.io.Serializable"});
 
@@ -57,8 +58,9 @@ public class Hello {
         //end of class
         cv.visitEnd();
 
-        byte[] bytecode = cw.toByteArray();
-        writeClassFile("HelloWorld", bytecode);
+        byte[] bytes = cw.toByteArray();
+        System.out.println(Arrays.toString(bytes));
+        //writeClassFile("HelloWorld", bytecode);
     }
 
 
