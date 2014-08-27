@@ -3816,7 +3816,7 @@ public class Compiler implements Opcodes {
             //TODO hacking with my debuging
             //ClassVisitor cv = cw;
 		    //ClassVisitor cv = new TraceClassVisitor(new CheckClassAdapter(cw), new PrintWriter(System.out));
-            ClassVisitor cv = new TraceClassVisitor(cw, null, "ObjExpr");
+            ClassVisitor cv = new TraceClassVisitor(cw, new PrintWriter(System.out), "ObjExpr");
             cv.visit(V1_5, ACC_PUBLIC + ACC_SUPER + ACC_FINAL, internalName, null, superName, interfaceNames);
 //		         superName != null ? superName :
 //		         (isVariadic() ? "clojure/lang/RestFn" : "clojure/lang/AFunction"), null);

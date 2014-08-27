@@ -20,7 +20,12 @@
     <context:property-placeholder location="classpath:config.properties" />
 
     <util:list id="defaultList" list-class="java.util.ArrayList" scope="singleton" value-type="java.lang.String">
-        <value>James</value><value>Peter</value><value>Andy</value><value>Vensent</value><value>Feigo</value><value>Frank</value>
+        <value>James</value>
+        <value>Peter</value>
+        <value>Andy</value>
+        <value>Vensent</value>
+        <value>Feigo</value>
+        <value>Frank</value>
     </util:list>
 
     <util:set id="defaultSet" set-class="java.util.HashSet" scope="singleton" value-type="java.lang.String">
@@ -45,16 +50,32 @@
     </bean>
 
 
-    <bean id="bizObject" class="com.alibaba.rfsc.cron.PoolingTask" />
+    <bean id="bizObject" class="com.alibaba.rfsc.cron.PoolingTask" scope="singleton" />
+    <bean id="bizObject2" class="com.alibaba.rfsc.cron.PoolingTask" scope="singleton" />
+
 
     <bean id="jobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
         <property name="targetObject" ref="bizObject" />
         <property name="targetMethod" value="doBiz" />
     </bean>
 
-    <bean id="cronTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+
+    <bean id="jobDetail2" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject" ref="bizObject2" />
+        <property name="targetMethod" value="doBiz" />
+    </bean>
+
+
+    <bean id="cronTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean" lazy-init="true">
         <property name="jobDetail" ref="jobDetail" />
         <property name="cronExpression" value="0/1 * * * * ?" />
+        <property name="group" value="Hello" />
+    </bean>
+
+
+    <bean id="cronTrigger2" class="org.springframework.scheduling.quartz.CronTriggerBean" lazy-init="true">
+        <property name="jobDetail" ref="jobDetail2" />
+        <property name="cronExpression" value="0/10 * * * * ?" />
         <property name="group" value="Hello" />
     </bean>
 
@@ -64,14 +85,19 @@
         <property name="repeatInterval" value="60000" />
     </bean>
 
-    <bean id="scheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+    <!--bean id="scheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean" scope="singleton">
         <property name="triggers">
             <list>
                 <ref bean="cronTrigger" />
+                <ref bean="cronTrigger2" />
             </list>
         </property>
         <property name="taskExecutor" ref="executor" />
-    </bean>
+    </bean-->
+
+    <bean id="schedulerHolder" class="com.alibaba.rfsc.cron.SchedulerHolder" />
+
+    <!--bean id="schedulerHolder" class="com.google.common.base.Optional" lazy-init="true" factory-method="fromNullable"><constructor-arg value="10" /></bean-->
 
     <!--
         <context:load-time-weaver aspectj-weaving="autodetect" weaver-class="org.springframework.context.weaving.DefaultContextLoadTimeWeaver" />

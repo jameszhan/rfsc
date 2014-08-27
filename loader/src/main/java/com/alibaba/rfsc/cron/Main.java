@@ -23,7 +23,11 @@ public class Main {
 
     public static void main(String[] args) throws SchedulerException, Exception {
         ApplicationContext appContext = new ClassPathXmlApplicationContext("applicationContext.xml");
-        Scheduler scheduler = appContext.getBean("scheduler", Scheduler.class);
+        //Scheduler scheduler = appContext.getBean("scheduler", Scheduler.class);
+
+        System.out.println(appContext.getBean("jobDetail"));
+
+        /*
 
         CronTrigger cronTrigger = new CronTrigger("hello", "DEFAULT", "0/5 * * * * ?");
 
@@ -34,6 +38,7 @@ public class Main {
 
         System.out.println("===========================");
         scheduler.start();
+        */
     }
 
 }
