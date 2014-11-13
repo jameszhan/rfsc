@@ -227,7 +227,7 @@
         <module>guice</module>
         <module>bigdata</module>
         <module>clojure</module>
-        <module>kindle</module>
+        <module>codegen</module>
     </modules>
 
 </project>
