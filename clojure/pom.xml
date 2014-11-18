@@ -15,18 +15,35 @@
             <resource>
                 <directory>src/main/resources</directory>
             </resource>
-            <resource>
-                <directory>src/main/clojure</directory>
-            </resource>
         </resources>
+
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals><goal>add-source</goal></goals>
+                        <configuration>
+                            <sources>
+                                <source>src/main/clojure</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
 
     <dependencies>
+        <!--
         <dependency>
             <groupId>org.clojure</groupId>
             <artifactId>clojure</artifactId>
             <version>1.6.0</version>
         </dependency>
+        -->
 
         <dependency>
             <groupId>com.google.guava</groupId>
