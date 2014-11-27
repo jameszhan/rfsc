@@ -10,6 +10,12 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>codegen</artifactId>
 
+    <properties>
+        <asm.version>5.0.3</asm.version>
+        <cglib.version>3.1</cglib.version>
+        <antlr4.version>4.2.2</antlr4.version>
+    </properties>
+
     <build>
         <resources>
             <resource>
@@ -50,31 +56,37 @@
         <dependency>
             <groupId>org.ow2.asm</groupId>
             <artifactId>asm</artifactId>
-            <version>4.2</version>
+            <version>${asm.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.ow2.asm</groupId>
             <artifactId>asm-commons</artifactId>
-            <version>4.2</version>
+            <version>${asm.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.ow2.asm</groupId>
             <artifactId>asm-util</artifactId>
-            <version>4.2</version>
+            <version>${asm.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.ow2.asm</groupId>
             <artifactId>asm-analysis</artifactId>
-            <version>4.2</version>
+            <version>${asm.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cglib</groupId>
+            <artifactId>cglib</artifactId>
+            <version>${cglib.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.antlr</groupId>
             <artifactId>antlr4</artifactId>
-            <version>4.2.2</version>
+            <version>${antlr4.version}</version>
         </dependency>
 
     </dependencies>
