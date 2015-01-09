@@ -5,6 +5,7 @@
  */
 package com.alibaba.rfsc.loader;
 
+import com.mulberry.rfsc.loader.Loader;
 import org.junit.Test;
 import org.junit.BeforeClass;
 

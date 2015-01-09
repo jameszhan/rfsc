@@ -50,8 +50,8 @@
     </bean>
 
 
-    <bean id="bizObject" class="com.alibaba.rfsc.cron.PoolingTask" scope="singleton" />
-    <bean id="bizObject2" class="com.alibaba.rfsc.cron.PoolingTask" scope="singleton" />
+    <bean id="bizObject" class="com.mulberry.rfsc.cron.PoolingTask" scope="singleton" />
+    <bean id="bizObject2" class="com.mulberry.rfsc.cron.PoolingTask" scope="singleton" />
 
 
     <bean id="jobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
@@ -95,7 +95,7 @@
         <property name="taskExecutor" ref="executor" />
     </bean-->
 
-    <bean id="schedulerHolder" class="com.alibaba.rfsc.cron.SchedulerHolder" />
+    <bean id="schedulerHolder" class="com.mulberry.rfsc.cron.SchedulerHolder" />
 
     <!--bean id="schedulerHolder" class="com.google.common.base.Optional" lazy-init="true" factory-method="fromNullable"><constructor-arg value="10" /></bean-->
 

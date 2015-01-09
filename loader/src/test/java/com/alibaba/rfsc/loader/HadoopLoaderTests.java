@@ -5,6 +5,7 @@
  */
 package com.alibaba.rfsc.loader;
 
+import com.mulberry.rfsc.loader.Loader;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
 import org.junit.BeforeClass;
