@@ -37,12 +37,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>${slf4j.version}</version>
-        </dependency>
-
-        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
@@ -277,7 +271,7 @@
         <module>clojure</module>
         <module>codegen</module>
         <module>netty</module>
-        <module>startup</module>
+        <module>kickoff</module>
     </modules>
 
 </project>
