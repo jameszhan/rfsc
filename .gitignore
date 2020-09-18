@@ -1,0 +1,10 @@
+*.class
+*.ipr
+*.iws
+*.iml
+.idea/
+*.zip
+*.tar.gz
+*.tar
+*.tgz
+*.rar
